@@ -4,7 +4,6 @@ import { mockChannels } from "@/mocks/channels";
 export default function Home() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
-      {/* Hero */}
       <section className="mb-12 max-w-xl mx-auto text-center">
         <h1 className="text-3xl font-bold mb-3">
            메인 문구
@@ -14,7 +13,6 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Search */}
       <section className="mb-8">
         <input
           placeholder="키워드를 입력하세요"
@@ -22,7 +20,6 @@ export default function Home() {
         />
       </section>
 
-      {/* Channel Cards */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {mockChannels.map((channel) => (
           <ChannelCard key={channel.id} channel={channel} />

@@ -1,30 +1,34 @@
-import ChannelCard from "@/components/channel/ChannelCard";
-import { mockChannels } from "@/mocks/channels";
+import SearchBar from "@/components/common/mainSearchBar";
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
-      <section className="mb-12 max-w-xl mx-auto text-center">
-        <h1 className="text-3xl font-bold mb-3">
-           메인 문구
+    <main className="bg-[#f6f3fb] min-h-screen max-w-6xl mx-auto px-6 py-10">
+      <section className="mb-12 max-w-xl mx-auto text-center mt-20">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text mb-3">
+           키워드로 인플루언서를 탐색해보세요 🔍
         </h1>
-        <p className="text-gray-500">
+        {/* <p className="text-gray-500">
           서브 문구 
-        </p>
+        </p> */}
       </section>
 
       <section className="mb-8">
-        <input
-          placeholder="키워드를 입력하세요"
-          className="w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black"
-        />
-      </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockChannels.map((channel) => (
-          <ChannelCard key={channel.id} channel={channel} />
-        ))}
       </section>
+      <div className="flex justify-center mt-30">
+        <div className="
+          w-full max-w-[1101px] h-[250px]
+          bg-white/60
+          backdrop-blur-md
+          rounded-[32px]
+          border-2 border-white/50
+          shadow-2xl shadow-purple-200/50
+          flex items-center justify-center
+          py-8 px-12
+        ">
+          <SearchBar />
+        </div>
+      </div>
     </main>
   )
 }

@@ -7,6 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 export default function Home() {
   const router = useRouter();
 
+  // 검색 키워드 받는 부모 함수
   const handleSearch = (keyword: string) => {
     if (!keyword.trim()) {
       toast.error(`검색어를 입력해주세요!` , {   // toast.error: 에러 메시지 출력

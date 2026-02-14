@@ -11,8 +11,9 @@ interface SearchBarProps {
 export default function SearchBar({ onSearch }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
+  // 부모 함수에 검색 키워드 전달
   const handleSearch = () => {
-    onSearch(searchQuery); 
+    onSearch(searchQuery); // searchQuery: 사용자가 입력한 검색 키워드임
   };;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -38,7 +39,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
           bg-white/10 backdrop-blur-lg
           border border-white/20
           rounded-2xl
-          text-black
+          text-gray-800
           placeholder-gray-400 font-semibold
           focus:outline-none focus:ring-2 focus:ring-white/30
           shadow-lg shadow-black/10

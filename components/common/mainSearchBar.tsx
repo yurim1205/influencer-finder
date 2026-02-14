@@ -2,18 +2,18 @@
 'use client';
 
 import { Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export default function SearchBar() {
-  const router = useRouter();
+interface SearchBarProps {
+  onSearch: (keyword: string) => void;
+}
+
+export default function SearchBar({ onSearch }: SearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = () => {
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
-  };
+    onSearch(searchQuery); 
+  };;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -24,7 +24,7 @@ export default function SearchBar() {
   return (
     <div className="bg-white rounded-2xl relative w-full max-w-2xl flex items-center">
       <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-        <Search className="w-5 h-5 text-gray-400" />
+        <Search className="w-5 h-5 text-black" />
       </div>
 
       <input
@@ -38,6 +38,7 @@ export default function SearchBar() {
           bg-white/10 backdrop-blur-lg
           border border-white/20
           rounded-2xl
+          text-black
           placeholder-gray-400 font-semibold
           focus:outline-none focus:ring-2 focus:ring-white/30
           shadow-lg shadow-black/10

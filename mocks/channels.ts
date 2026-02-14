@@ -49,5 +49,12 @@ export const mockChannels: Channel[] = [
     averageViews: 780000,
     description: "메이크업 튜토리얼과 뷰티 팁을 알려드립니다.",
   },
+  {
+    id: "7",
+    name: "음악 채널",
+    subscribers: 1000000,
+    averageViews: 500000,
+    description: "음악 채널입니다.",
+  },
 ];
 

@@ -1,7 +1,26 @@
 // components/SearchBar.tsx
+'use client';
+
 import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SearchBar() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl relative w-full max-w-2xl flex items-center">
       <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -10,6 +29,9 @@ export default function SearchBar() {
 
       <input
         type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="뷰티, 브이로그, 음악 등 키워드를 입력하세요"
         className="
           w-full pl-12 pr-24 py-3
@@ -25,6 +47,7 @@ export default function SearchBar() {
       
       <button
         type="button"
+        onClick={handleSearch}
         className="
           absolute right-2
           w-10 h-10

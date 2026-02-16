@@ -12,8 +12,8 @@ function SearchResults() {
   // 키워드로 필터링
   const filteredChannels = keyword
     ? mockChannels.filter(channel =>
-        channel.name.toLowerCase().includes(keyword.toLowerCase()) ||
-        channel.description.toLowerCase().includes(keyword.toLowerCase())
+        channel.name.toLowerCase().includes(keyword.toLowerCase()) ||     // 채널명 검색
+        channel.description.toLowerCase().includes(keyword.toLowerCase()) // 채널 설명 검색
       )
     : mockChannels;
 
@@ -45,12 +45,6 @@ function SearchResults() {
             <p className="text-lg text-gray-400 mt-4">
               다른 키워드로 검색해보세요
             </p>
-            {/* <Link 
-              href="/"
-              className="mt-6 inline-block px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition"
-            >
-              다시 검색하기
-            </Link> */}
           </div>
         )}
 

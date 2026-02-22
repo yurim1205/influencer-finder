@@ -4,6 +4,7 @@ import { convertToChannel, getChannelDetails } from "@/lib/youtube";
 import { ArrowLeft } from "lucide-react";
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
@@ -12,12 +13,13 @@ interface ChannelPageProps {
 export default function ChannelPage({ params }: ChannelPageProps) {
   const [channel, setChannel] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchChannel() {
       const { id } = await params;
       const channelData = await getChannelDetails(id);
-      
+
       if (channelData) {
         setChannel(convertToChannel(channelData));
       }
@@ -56,12 +58,12 @@ export default function ChannelPage({ params }: ChannelPageProps) {
     <div className="min-h-screen bg-[#f6f3fb] px-6 py-10">
       <div className="max-w-4xl mx-auto">
         {/* 뒤로가기 */}
-        <Link 
-          href="/search"
+        <button
+          onClick={() => router.back()}
           className="text-purple-600 hover:text-purple-800 mb-6 inline-block font-semibold"
         >
           <ArrowLeft className="w-5 h-5 text-purple-600" />
-        </Link>
+        </button>
 
         <div className="mb-0">
           <h1 className="text-4xl font-bold text-black mb-6">

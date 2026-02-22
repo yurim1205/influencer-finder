@@ -1,6 +1,15 @@
 const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 const YOUTUBE_API_BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
+export interface Channel {
+  id: string;
+  name: string;         // 채널명
+  subscribers: number; // 구독자 수
+  averageViews: number; // 평균 조회수
+  description: string; // 채널에 대한 설명
+  thumbnail: string; // 채널 썸네일
+}
+
 // 채널 검색
 export async function searchChannels(query: string) {
   try {
@@ -43,7 +52,7 @@ export async function getChannelDetails(channelId: string) {
 }
 
 // YouTube 데이터를 쓸 수 있는 타입으로 변환
-export function convertToChannel(youtubeChannel: any) {
+export function convertToChannel(youtubeChannel: any): Channel {
   return {
     id: youtubeChannel.id.channelId || youtubeChannel.id,
     name: youtubeChannel.snippet.title,

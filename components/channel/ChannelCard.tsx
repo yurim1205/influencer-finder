@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Channel } from "@/mocks/channels";
+import type { Channel } from "@/lib/youtube";
 
 interface ChannelCardProps {
   channel: Channel;

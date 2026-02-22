@@ -1,10 +1,9 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Channel } from '@/mocks/channels';
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
-import { convertToChannel, getChannelDetails, searchChannels } from '@/lib/youtube';
+import { Channel, convertToChannel, getChannelDetails, searchChannels } from '@/lib/youtube';
 
 function SearchResults() {
   const searchParams = useSearchParams();

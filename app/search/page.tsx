@@ -81,8 +81,7 @@ function SearchResults() {
               </p>
             </div>
 
-        {/* 검색 결과가 없을 때 */}
-        {filteredChannels.length === 0 && !loading && (
+        {filteredChannels.length > 0 && !loading && (
            <select
               value={sortType}
               onChange={(e) => setSortType(e.target.value as 'default' | 'subscribers')}

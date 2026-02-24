@@ -2,8 +2,10 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Channel, convertToChannel, getChannelDetails, searchChannels } from '@/lib/youtube';
+
+const searchCache = new Map<string, Channel[]>();
 
 function SearchResults() {
   const searchParams = useSearchParams();
@@ -16,15 +18,22 @@ function SearchResults() {
 
   useEffect(() => {
     async function fetchChannels() {
+
       if (!keyword) {
         setChannels([]);
+        return;
+      } 
+
+      // 결과가 캐시에 있으면 바로 사용하기
+      if (searchCache.has(keyword)) {
+        setChannels(searchCache.get(keyword) || []);
         return;
       }
 
       setLoading(true);
+
       try {
         const searchResults = await searchChannels(keyword);
-        console.log('검색 결과:', searchResults);
 
         const channelPromises = searchResults.map(async (result:any) => {
           const channelId = result.id.channelId;
@@ -38,15 +47,15 @@ function SearchResults() {
         // 데이터 필러팅 및 빈 데이터 제거
         const validChannels = channelDetails.filter((ch): ch is Channel => ch !== null);
 
-        console.log('채널 데이터:', validChannels);
+        // 캐시에 결과 저장
+        searchCache.set(keyword, validChannels);
         setChannels(validChannels);
       } catch (error) {
-        console.error('채널 검색 에러:', error);
         setChannels([]);
       } finally {
         setLoading(false);
-        }
       }
+    }
 
     fetchChannels();
   }, [keyword]);
@@ -81,8 +90,7 @@ function SearchResults() {
               </p>
             </div>
 
-        {/* 검색 결과가 없을 때 */}
-        {filteredChannels.length === 0 && !loading && (
+        {filteredChannels.length > 0 && !loading && (
            <select
               value={sortType}
               onChange={(e) => setSortType(e.target.value as 'default' | 'subscribers')}

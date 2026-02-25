@@ -3,7 +3,9 @@
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { Channel, convertToChannel, getChannelDetails, searchChannels } from '@/lib/youtube';
+import { 
+  Channel, convertToChannel, getChannelDetails, searchChannels, searchChannelsHybrid 
+} from '@/lib/youtube';
 
 const searchCache = new Map<string, Channel[]>();
 
@@ -18,7 +20,6 @@ function SearchResults() {
 
   useEffect(() => {
     async function fetchChannels() {
-
       if (!keyword) {
         setChannels([]);
         return;
@@ -27,30 +28,22 @@ function SearchResults() {
       // 결과가 캐시에 있으면 바로 사용하기
       if (searchCache.has(keyword)) {
         setChannels(searchCache.get(keyword) || []);
-        return;
+        return; // 캐시 있으면 api 호출 안 하고 바로 사용함
       }
 
       setLoading(true);
 
       try {
-        const searchResults = await searchChannels(keyword);
-
-        const channelPromises = searchResults.map(async (result:any) => {
-          const channelId = result.id.channelId;
-          const details = await getChannelDetails(channelId);
-          return details ? convertToChannel(details) : null;
-        });
+        const searchResults = await searchChannelsHybrid(keyword);
         
-        // Promise들을 풀어서 실제 데이터로 변환
-        const channelDetails = await Promise.all(channelPromises);
-
-        // 데이터 필러팅 및 빈 데이터 제거
-        const validChannels = channelDetails.filter((ch): ch is Channel => ch !== null);
-
+        // 이미 Channel 타입이므로 그대로 사용
+        const validChannels = searchResults.filter((ch): ch is Channel => ch !== null);
+  
         // 캐시에 결과 저장
         searchCache.set(keyword, validChannels);
         setChannels(validChannels);
       } catch (error) {
+        console.error('채널 검색 에러:', error);
         setChannels([]);
       } finally {
         setLoading(false);
@@ -113,12 +106,12 @@ function SearchResults() {
       </div>
 
         {/* 로딩 중 */}
-          {loading && (
-                  <div className="text-center py-20">
-                    <div className="text-4xl mb-4">🔍</div>
-                    <p className="text-xl text-gray-600">채널을 검색하는 중...</p>
-                  </div>
-                )}
+        {loading && channels.length === 0 && (
+          <div className="text-center py-20">
+            <div className="text-4xl mb-4">🔍</div>
+            <p className="text-xl text-gray-600">채널을 검색하는 중...</p>
+          </div>
+        )}
 
                 {/* 검색 결과가 없을 때 */}
                 {!loading && keyword && filteredChannels.length === 0 && (
@@ -133,7 +126,7 @@ function SearchResults() {
                 )}
 
         {/* 검색 결과 출력 */}
-        {!loading && filteredChannels.length > 0 && (
+        { filteredChannels.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredChannels.map(channel => (
               <Link
@@ -149,23 +142,52 @@ function SearchResults() {
                 "
               >
 
-                {channel.thumbnail && (
-                  <img 
-                    src={channel.thumbnail} alt={channel.name} 
-                    className="w-full h-40 object-cover rounded-lg mb-4" 
+                {channel.matchVideo?.thumbnail ? (
+                  <div className="relative">
+                    <img 
+                      src={channel.matchVideo.thumbnail}
+                      alt={channel.matchVideo.title}
+                      className="w-full h-40 object-cover rounded-lg mb-4"
                     />
-                )}
+                  
+                      <div className="absolute top-2 left-2 bg-red-600 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <span>영상</span>
+                      </div>
+                    </div>
+                  ) : channel.thumbnail ? (
+                  <img 
+                    src={channel.thumbnail} 
+                    alt={channel.name} 
+                    className="w-full h-40 object-cover" 
+                  />
+                ) : null}
 
+                <div className='p-6'>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">
                   {channel.name}
                 </h3>
-                <p className="text-gray-600 mb-4 line-clamp-2">
+
+                {channel.matchVideo && (
+                  <div className="mb-3 flex items-start gap-2">
+                    <span className="text-purple-600 text-sm">📹</span>
+                    <p className="text-sm text-purple-600 font-medium line-clamp-2">
+                      {channel.matchVideo.title}
+                    </p>
+                  </div>
+                )}
+
+                <p className="text-gray-600 mb-4 line-clamp-2 text-sm">
                   {channel.description}
                 </p>
+
                 <div className="flex flex-col gap-2 text-sm text-gray-500">
                   <span>👥 구독자: {channel.subscribers.toLocaleString()}</span>
-                  <span>👁️ 평균 조회수: {channel.averageViews.toLocaleString()}</span>
+                  <span>👁️ 총 조회수: {channel.averageViews.toLocaleString()}</span>
                 </div>
+              </div>
               </Link>
             ))}
           </div>

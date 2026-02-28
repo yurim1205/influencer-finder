@@ -22,25 +22,84 @@ export default function Home() {
   return (
     <>
     <Toaster position="top-center" />
-    <main className="bg-[#f6f3fb] min-h-screen max-w-6xl mx-auto px-6 py-10">
-      <section className="mb-12 max-w-xl mx-auto text-center mt-20">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text mb-3">
-           키워드로 인플루언서를 탐색해보세요 🔍
+    <main className=" bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 min-h-screen">
+      <section className="mb-12 text-center pt-60">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text mb-16">
+           키워드로 원하는 채널을 탐색해보세요 ✨
         </h1>
       </section>
 
-      <div className="flex justify-center mt-30">
-        <div className="
-          w-full max-w-[1101px] h-[250px]
-          bg-white/60
-          backdrop-blur-md
-          rounded-[32px]
-          border-2 border-white/50
-          shadow-2xl shadow-purple-200/50
-          flex items-center justify-center
-          py-8 px-12
-        ">
-          <SearchBar onSearch={handleSearch}/>
+      <div className="flex flex-col items-center gap-6 py-10">
+        <div className="w-full max-w-3xl">
+          <SearchBar onSearch={handleSearch}/> 
+        </div>
+        
+        {/* 추천 키워드 */}
+        <div className="mt-6 flex gap-3 justify-center flex-wrap">
+          <button 
+            onClick={() => handleSearch('뷰티')}
+            className="
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            hover:scale-105 transition-all duration-300
+            shadow-lg shadow-black/10 hover:cursor-pointer
+            "
+          >
+            #뷰티
+          </button>
+          <button 
+            onClick={() => handleSearch('게임')}
+            className="
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            hover:scale-105 transition-all duration-300 shadow-lg shadow-black/10
+            hover:cursor-pointer
+            "
+          >
+            #게임
+          </button>
+          <button 
+            onClick={() => handleSearch('음악')}
+            className="   
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            hover:scale-105 transition-all duration-300
+            shadow-lg shadow-black/10
+            hover:cursor-pointer
+            "
+          >
+            #음악
+          </button>
+          <button 
+            onClick={() => handleSearch('요리')}
+            className="
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            hover:scale-105 transition-all duration-300
+            shadow-lg shadow-black/10
+            hover:cursor-pointer
+            "
+          >
+            #요리
+          </button>
+          <button 
+            onClick={() => handleSearch('브이로그')}
+            className="
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            hover:scale-105 transition-all duration-300
+            shadow-lg shadow-black/10
+            hover:cursor-pointer
+            "
+          >
+            #브이로그
+          </button>
+          <button 
+            onClick={() => handleSearch('운동')}
+            className="
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            hover:scale-105 transition-all duration-300
+            shadow-lg shadow-black/10
+            hover:cursor-pointer
+            "
+          >
+            #운동
+          </button>
         </div>
       </div>
     </main>

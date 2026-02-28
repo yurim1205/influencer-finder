@@ -1,4 +1,3 @@
-// components/SearchBar.tsx
 'use client';
 
 import { Search } from 'lucide-react';
@@ -23,11 +22,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl relative w-full max-w-2xl flex items-center">
-      <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-        <Search className="w-5 h-5 text-black" />
-      </div>
-
+    <div className="rounded-2xl relative w-full flex items-center h-12">
       <input
         type="text"
         value={searchQuery}
@@ -35,10 +30,10 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         onKeyDown={handleKeyDown}
         placeholder="뷰티, 브이로그, 음악 등 키워드를 입력하세요"
         className="
-          w-full pl-12 pr-24 py-3
-          bg-white/10 backdrop-blur-lg
+          w-full pl-12 pr-24 py-3 h-18
+          bg-white backdrop-blur-lg
           border border-white/20
-          rounded-2xl
+          rounded-4xl
           text-gray-800
           placeholder-gray-400 font-semibold
           focus:outline-none focus:ring-2 focus:ring-white/30
@@ -51,10 +46,10 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         type="button"
         onClick={handleSearch}
         className="
-          absolute right-2
+          absolute right-4
           w-10 h-10
           bg-purple-600
-          rounded-xl
+          rounded-2xl
           flex items-center justify-center
           hover:bg-purple-700
           active:bg-purple-800

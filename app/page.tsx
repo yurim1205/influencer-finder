@@ -39,7 +39,7 @@ export default function Home() {
           <button 
             onClick={() => handleSearch('뷰티')}
             className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
             hover:scale-105 transition-all duration-300
             shadow-lg shadow-black/10 hover:cursor-pointer
             "
@@ -49,7 +49,7 @@ export default function Home() {
           <button 
             onClick={() => handleSearch('게임')}
             className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
             hover:scale-105 transition-all duration-300 shadow-lg shadow-black/10
             hover:cursor-pointer
             "
@@ -59,7 +59,7 @@ export default function Home() {
           <button 
             onClick={() => handleSearch('음악')}
             className="   
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
             hover:scale-105 transition-all duration-300
             shadow-lg shadow-black/10
             hover:cursor-pointer
@@ -70,7 +70,7 @@ export default function Home() {
           <button 
             onClick={() => handleSearch('요리')}
             className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
             hover:scale-105 transition-all duration-300
             shadow-lg shadow-black/10
             hover:cursor-pointer
@@ -81,7 +81,7 @@ export default function Home() {
           <button 
             onClick={() => handleSearch('브이로그')}
             className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
             hover:scale-105 transition-all duration-300
             shadow-lg shadow-black/10
             hover:cursor-pointer
@@ -92,7 +92,7 @@ export default function Home() {
           <button 
             onClick={() => handleSearch('운동')}
             className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm 
+            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
             hover:scale-105 transition-all duration-300
             shadow-lg shadow-black/10
             hover:cursor-pointer

@@ -57,8 +57,12 @@ export async function getChannelDetails(channelId: string) {
 
 // YouTube 데이터를 쓸 수 있는 타입으로 변환
 export function convertToChannel(youtubeChannel: any): Channel {
+  const channelId = typeof youtubeChannel.id === 'string' 
+    ? youtubeChannel.id 
+    : youtubeChannel.id.channelId || youtubeChannel.id;
+    
   return {
-    id: youtubeChannel.id.channelId || youtubeChannel.id,
+    id: channelId,
     name: youtubeChannel.snippet.title,
     description: youtubeChannel.snippet.description,
     subscribers: parseInt(youtubeChannel.statistics?.subscriberCount || '0'),
@@ -121,7 +125,7 @@ export async function searchChannelsByVideo(query: string) {
 export async function searchChannelsHybrid(query: string) {
   try {
     // 채널명 검색
-    const channelResults = await searchChannels(query);
+    const channelSearchResults = await searchChannels(query);
 
     // 영상 제목 검색
     const videoResults = await searchChannelsByVideo(query);
@@ -132,10 +136,23 @@ export async function searchChannelsHybrid(query: string) {
     channelmap.set(channel.id, channel);
    });
 
+   // channelSearchResults도 상세 정보로 변환
+   const channelDetailsPromises = channelSearchResults.map(async (item: any) => {
+     const channelId = item.id.channelId || item.id;
+     if (typeof channelId === 'string' && !channelmap.has(channelId)) {
+       const details = await getChannelDetails(channelId);
+       if (details) {
+         return convertToChannel(details);
+       }
+     }
+     return null;
+   });
+
+   const channelResults = await Promise.all(channelDetailsPromises);
    channelResults.forEach((channel: any) => {
-    if (!channelmap.has(channel.id)) {
-      channelmap.set(channel.id, channel);
-    }
+     if (channel && !channelmap.has(channel.id)) {
+       channelmap.set(channel.id, channel);
+     }
    });
 
    return Array.from(channelmap.values()).slice(0, 10);

@@ -30,7 +30,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f6f3fb] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">⏳</div>
           <p className="text-xl text-gray-600">채널 정보를 불러오는 중...</p>
@@ -41,7 +41,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
 
   if (!channel) {
     return (
-      <div className="min-h-screen bg-[#f6f3fb] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">
             채널을 찾을 수 없습니다 😢
@@ -55,7 +55,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f3fb] px-6 py-10">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 px-6 py-10">
       <div className="max-w-4xl mx-auto">
         {/* 뒤로가기 */}
         <button

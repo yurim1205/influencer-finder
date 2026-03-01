@@ -2,9 +2,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { 
-  Channel, convertToChannel, getChannelDetails, searchChannels, searchChannelsHybrid 
+  Channel, searchChannelsHybrid 
 } from '@/lib/youtube';
 
 const searchCache = new Map<string, Channel[]>();
@@ -54,7 +54,10 @@ function SearchResults() {
   }, [keyword]);
   
   // 정렬
-  const filteredChannels = [...channels].sort((a, b) => {
+  const filteredChannels = [...channels]
+  .filter((channel, index, self) =>
+     index === self.findIndex((ch) => ch.id === channel.id))
+  .sort((a, b) => {
     if (sortType === 'subscribers') {
       return b.subscribers - a.subscribers;
     }
@@ -184,8 +187,8 @@ function SearchResults() {
                 </p>
 
                 <div className="flex flex-col gap-2 text-sm text-gray-500">
-                  <span>👥 구독자: {channel.subscribers.toLocaleString()}</span>
-                  <span>👁️ 총 조회수: {channel.averageViews.toLocaleString()}</span>
+                  <span>👥 구독자: {channel.subscribers?.toLocaleString()}</span>
+                  <span>👁️ 총 조회수: {channel.averageViews?.toLocaleString()}</span>
                 </div>
               </div>
               </Link>

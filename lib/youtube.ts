@@ -155,9 +155,10 @@ export async function searchChannelsHybrid(query: string) {
      }
    });
 
-   return Array.from(channelmap.values()).slice(0, 10);
+   return Array.from(channelmap.values()).slice(0, 10);[[]]
   } catch (error) {
     console.error('하이브리드 검색 에러:', error);
     return [];
   }
 }
+

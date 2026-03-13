@@ -2,7 +2,6 @@
 
 import { convertToChannel, getChannelDetails } from "@/lib/youtube";
 import { ArrowLeft } from "lucide-react";
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -46,9 +45,9 @@ export default function ChannelPage({ params }: ChannelPageProps) {
           <h1 className="text-2xl font-bold text-gray-800 mb-4">
             채널을 찾을 수 없습니다 😢
           </h1>
-          <Link href="/" className="text-purple-600 hover:underline">
-            메인으로 돌아가기
-          </Link>
+          <button onClick={() => router.back()} className="text-purple-600 hover:underline">
+            <ArrowLeft className="w-5 h-5 text-purple-600" />
+          </button>
         </div>
       </div>
     );
@@ -65,26 +64,22 @@ export default function ChannelPage({ params }: ChannelPageProps) {
           <ArrowLeft className="w-5 h-5 text-purple-600" />
         </button>
 
-        <div className="mb-0">
-          <h1 className="text-4xl font-bold text-black mb-6">
-            {channel.name}
-          </h1>
-          {/* 구분선 */}
-          <div className="border-t-2 border-black"></div>
-        </div>
+        <h1 className="text-[] font-semibold text-black mb-8">
+          {channel.name}
+        </h1>
 
-        {/* 메인 컨테이너 */}
-        <div className="bg-white border-2 border-black mt-12">
-          {/* 썸네일/이미지 영역 */}
-          <div className="border-b border-black">
+        {/* 2열 그리드 레이아웃 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* 왼쪽: 썸네일 */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
             {channel.thumbnail ? (
               <img 
                 src={channel.thumbnail} 
                 alt={channel.name}
-                className="w-full h-96 object-cover"
+                className="w-full aspect-square object-cover rounded-2xl"
               />
             ) : (
-              <div className="bg-gray-100 h-96 flex items-center justify-center">
+              <div className="bg-gray-100 aspect-square flex items-center justify-center rounded-2xl">
                 <div className="text-center">
                   <div className="text-9xl mb-4">🎥</div>
                   <p className="text-gray-500 text-lg font-medium">채널 썸네일</p>
@@ -93,32 +88,39 @@ export default function ChannelPage({ params }: ChannelPageProps) {
             )}
           </div>
 
-          {/* 주요 정보 섹션 */}
-          <div className="px-8 py-6 border-b-2 border-black">
-            <div className="flex gap-4">
-              
-              {/* 정보 내용 */}
-              <div className="flex-1">
-                <div className="space-y-2">
-                  <p className="text-base text-gray-700">
-                    <span className="font-semibold">👥 구독자:</span> {channel.subscribers.toLocaleString()}명
+        
+          {/* 오른쪽: 정보 */}
+          <div className="flex flex-col gap-6">
+            {/* 채널 설명 */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
+              <h2 className="text-base text-gray-700 mb-4">채널 설명</h2>
+              <p className="text-base text-gray-700 leading-relaxed text-xl font-bold text-black">
+                {channel.description || '채널 설명이 없습니다.'}
+              </p>
+            </div>
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
+              <div className="space-y-4">
+                <div>
+                  <p className="text-lg text-gray-600">구독자</p>
+                  <p className="text-3xl font-bold text-black">
+                    {channel.subscribers?.toLocaleString() || '0'}명
                   </p>
-                  <p className="text-base text-gray-700">
-                    <span className="font-semibold">👁️ 평균 조회수:</span> {channel.averageViews.toLocaleString()}회
+                </div>
+                <div>
+                  <p className="text-lg text-gray-600">조회수</p>
+                  <p className="text-3xl font-bold text-black">
+                    {channel.averageViews?.toLocaleString() || '0'}회
                   </p>
                 </div>
               </div>
             </div>
+            <div className="mt-12">
+          <h2 className="text-2xl font-bold text-black mb-6">📹 최신 영상</h2>
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
           </div>
-
-          {/* 채널 설명 섹션 */}
-          <div className="px-8 py-6 border-b border-gray-300">
-            <div className="space-y-4">
-              <p className="text-base text-gray-800 leading-relaxed">
-                {channel.description}
-              </p>
-            </div>
-          </div>
+        </div>
+      </div>
+          
         </div>
       </div>
     </div>

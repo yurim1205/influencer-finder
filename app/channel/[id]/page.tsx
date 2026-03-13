@@ -1,6 +1,6 @@
 'use client';
 
-import { convertToChannel, getChannelDetails } from "@/lib/youtube";
+import { convertToChannel, getChannelDetails, getChannelLatestVideos } from "@/lib/youtube";
 import { ArrowLeft } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ interface ChannelPageProps {
 export default function ChannelPage({ params }: ChannelPageProps) {
   const [channel, setChannel] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [latestVideos, setLatestVideos] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -21,6 +22,8 @@ export default function ChannelPage({ params }: ChannelPageProps) {
 
       if (channelData) {
         setChannel(convertToChannel(channelData));
+        const latestVideos = await getChannelLatestVideos(id);
+        setLatestVideos(latestVideos);
       }
       setLoading(false);
     }
@@ -56,7 +59,6 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 px-6 py-10">
       <div className="max-w-4xl mx-auto">
-        {/* 뒤로가기 */}
         <button
           onClick={() => router.back()}
           className="text-purple-600 hover:text-purple-800 mb-6 inline-block font-semibold"
@@ -68,9 +70,8 @@ export default function ChannelPage({ params }: ChannelPageProps) {
           {channel.name}
         </h1>
 
-        {/* 2열 그리드 레이아웃 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 왼쪽: 썸네일 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          {/* 왼쪽 썸네일 */}
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
             {channel.thumbnail ? (
               <img 
@@ -89,9 +90,8 @@ export default function ChannelPage({ params }: ChannelPageProps) {
           </div>
 
         
-          {/* 오른쪽: 정보 */}
-          <div className="flex flex-col gap-6">
-            {/* 채널 설명 */}
+        {/* 오른쪽 영역 */}
+        <div className="flex flex-col gap-6">
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
               <h2 className="text-base text-gray-700 mb-4">채널 설명</h2>
               <p className="text-base text-gray-700 leading-relaxed text-xl font-bold text-black">
@@ -114,13 +114,30 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                 </div>
               </div>
             </div>
-            <div className="mt-12">
+          </div> 
+        </div> 
+
+        <div className="mt-8">
           <h2 className="text-2xl font-bold text-black mb-6">📹 최신 영상</h2>
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {latestVideos.map((video) => (
+              <a
+                key={video.id.videoId}
+                href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-[1.01]"
+              >
+                <img
+                  src={video.snippet.thumbnails.medium.url}
+                  alt={video.snippet.title}
+                  className="w-full h-40 object-cover rounded-xl mb-3"
+                />
+                <p className="font-semibold text-gray-800 line-clamp-2">{video.snippet.title}</p>
+                <p className="text-sm text-gray-500 mt-1">{video.snippet.publishedAt.slice(0, 10)}</p>
+              </a>
+            ))}
           </div>
-        </div>
-      </div>
-          
         </div>
       </div>
     </div>

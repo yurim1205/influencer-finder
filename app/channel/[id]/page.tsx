@@ -57,6 +57,13 @@ export default function ChannelPage({ params }: ChannelPageProps) {
     );
   }
 
+  const formatCount = (num: number) => {
+    if (num >= 100000000) return `${(num / 100000000).toFixed(0)}억`;
+    if (num >= 10000) return `${(num / 10000).toFixed(0)}만`;
+    if (num >= 1000) return `${(num / 1000).toFixed(0)}천`;
+    return num.toString();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 px-6 py-10">
       <div className="max-w-4xl mx-auto">
@@ -104,13 +111,13 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                 <div>
                   <p className="text-lg text-gray-600">구독자</p>
                   <p className="text-3xl font-bold text-black">
-                    {channel.subscribers?.toLocaleString() || '0'}명
+                    {formatCount(channel.subscribers || 0)}
                   </p>
                 </div>
                 <div>
                   <p className="text-lg text-gray-600">조회수</p>
                   <p className="text-3xl font-bold text-black">
-                    {channel.averageViews?.toLocaleString() || '0'}회
+                    {formatCount(channel.averageViews || 0)}
                   </p>
                 </div>
               </div>

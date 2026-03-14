@@ -64,6 +64,13 @@ function SearchResults() {
     return 0;
   });
 
+  const formatCount = (num: number) => {
+    if (num >= 100000000) return `${(num / 100000000).toFixed(0)}억`;
+    if (num >= 10000) return `${(num / 10000).toFixed(0)}만`;
+    if (num >= 1000) return `${(num / 1000).toFixed(0)}천`;
+    return num.toString();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-8">
       <div className="max-w-7xl mx-auto">
@@ -189,8 +196,8 @@ function SearchResults() {
                 </p>
 
                 <div className="flex flex-col gap-2 text-sm text-gray-500">
-                  <span>👥 구독자: {channel.subscribers?.toLocaleString()}</span>
-                  <span>👁️ 총 조회수: {channel.averageViews?.toLocaleString()}</span>
+                  <span>👥 구독자: {formatCount(channel.subscribers || 0)}</span>
+                  <span>👁️ 총 조회수: {formatCount(channel.averageViews || 0)}</span>
                 </div>
               </div>
               </Link>

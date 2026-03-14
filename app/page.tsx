@@ -22,7 +22,25 @@ export default function Home() {
   return (
     <>
     <Toaster position="top-center" />
-    <main className=" bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 min-h-screen">
+    <main className="relative bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 min-h-screen">
+        {[
+        { label: '#뷰티', top: '12%', left: '15%' },
+        { label: '#게임', top: '20%', right: '8%' },
+        { label: '#음악', top: '58%', left: '5%' },
+        { label: '#요리', bottom: '20%', right: '15%' },
+        { label: '#여행', top: '75%', left: '20%' },
+        { label: '#패션', top: '35%', right: '3%' },
+        { label: '#운동', bottom: '10%', left: '8%' },
+        { label: '#브이로그', top: '15%', right: '19%' },
+      ].map((tag, i) => (
+          <span
+          key={i}
+          className="absolute px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800 shadow-lg shadow-black/10 pointer-events-none select-none opacity-60"
+          style={{ top: tag.top, left: tag.left, right: tag.right, bottom: tag.bottom }}
+        >
+          {tag.label}
+        </span>
+      ))}
       <section className="mb-12 text-center pt-60">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text mb-16">
            키워드로 원하는 채널을 탐색해보세요 ✨
@@ -32,74 +50,6 @@ export default function Home() {
       <div className="flex flex-col items-center gap-6 py-10">
         <div className="w-full max-w-3xl">
           <SearchBar onSearch={handleSearch}/> 
-        </div>
-        
-        {/* 추천 키워드 */}
-        <div className="mt-6 flex gap-3 justify-center flex-wrap">
-          <button 
-            onClick={() => handleSearch('뷰티')}
-            className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
-            hover:scale-105 transition-all duration-300
-            shadow-lg shadow-black/10 hover:cursor-pointer
-            "
-          >
-            #뷰티
-          </button>
-          <button 
-            onClick={() => handleSearch('게임')}
-            className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
-            hover:scale-105 transition-all duration-300 shadow-lg shadow-black/10
-            hover:cursor-pointer
-            "
-          >
-            #게임
-          </button>
-          <button 
-            onClick={() => handleSearch('음악')}
-            className="   
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
-            hover:scale-105 transition-all duration-300
-            shadow-lg shadow-black/10
-            hover:cursor-pointer
-            "
-          >
-            #음악
-          </button>
-          <button 
-            onClick={() => handleSearch('요리')}
-            className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
-            hover:scale-105 transition-all duration-300
-            shadow-lg shadow-black/10
-            hover:cursor-pointer
-            "
-          >
-            #요리
-          </button>
-          <button 
-            onClick={() => handleSearch('브이로그')}
-            className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
-            hover:scale-105 transition-all duration-300
-            shadow-lg shadow-black/10
-            hover:cursor-pointer
-            "
-          >
-            #브이로그
-          </button>
-          <button 
-            onClick={() => handleSearch('운동')}
-            className="
-            px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800
-            hover:scale-105 transition-all duration-300
-            shadow-lg shadow-black/10
-            hover:cursor-pointer
-            "
-          >
-            #운동
-          </button>
         </div>
       </div>
     </main>

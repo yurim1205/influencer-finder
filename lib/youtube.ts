@@ -162,3 +162,21 @@ export async function searchChannelsHybrid(query: string) {
   }
 }
 
+// 채널 최신 영상 가져오는 함수
+export async function getChannelLatestVideos(channelId: string, maxResults: number = 6) {
+  try {
+    const response = await fetch(
+      `${YOUTUBE_API_BASE_URL}/search?` +
+      `part=snippet&channelId=${channelId}&type=video&order=date&` +
+      `maxResults=${maxResults}&key=${YOUTUBE_API_KEY}`
+    );
+
+    if (!response.ok) throw new Error('YouTube API 호출 실패');
+
+    const data = await response.json();
+    return data.items || [];
+  } catch (error) {
+    console.error('최신 영상 가져오기 에러:', error);
+    return [];
+  }
+}

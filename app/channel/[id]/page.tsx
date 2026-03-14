@@ -1,7 +1,7 @@
 'use client';
 
 import { convertToChannel, getChannelDetails, getChannelLatestVideos } from "@/lib/youtube";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -14,7 +14,8 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   const [loading, setLoading] = useState(true);
   const [latestVideos, setLatestVideos] = useState<any[]>([]);
   const router = useRouter();
-
+  const [videoPage, setVideoPage] = useState(0);    
+  const videosPerPage = 3;
   useEffect(() => {
     async function fetchChannel() {
       const { id } = await params;
@@ -117,26 +118,49 @@ export default function ChannelPage({ params }: ChannelPageProps) {
           </div> 
         </div> 
 
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold text-black mb-6">📹 최신 영상</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {latestVideos.map((video) => (
-              <a
-                key={video.id.videoId}
-                href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-[1.01]"
-              >
-                <img
-                  src={video.snippet.thumbnails.medium.url}
-                  alt={video.snippet.title}
-                  className="w-full h-40 object-cover rounded-xl mb-3"
-                />
-                <p className="font-semibold text-gray-800 line-clamp-2">{video.snippet.title}</p>
-                <p className="text-sm text-gray-500 mt-1">{video.snippet.publishedAt.slice(0, 10)}</p>
-              </a>
-            ))}
+        <div className="mt-14">
+          <h2 className="text-xl font-bold text-black mb-6">
+            채널의 최신 영상
+          </h2>
+          
+          <div className="relative">
+          <button
+            onClick={() => {
+              setVideoPage((prev) => Math.max(prev - 1, 0));
+            }}
+            disabled={videoPage === 0}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all 
+            duration-300 text-purple-400 hover:text-purple-600"
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </button>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {latestVideos.slice(videoPage * videosPerPage, videoPage * videosPerPage + videosPerPage).map((video) => (
+                <a
+                  key={video.id.videoId}
+                  href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-[1.01]"
+                >
+                  <img src={video.snippet.thumbnails.medium.url} alt={video.snippet.title} className="w-full h-40 object-cover rounded-xl mb-3" />
+                  <p className="font-semibold text-gray-800 line-clamp-2">{video.snippet.title}</p>
+                  <p className="text-sm text-gray-500 mt-1">{video.snippet.publishedAt.slice(0, 10)}</p>
+                </a>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => {
+                setVideoPage((prev) => Math.min(prev + 1, Math.ceil(latestVideos.length / 3) - 1));
+              }}
+              disabled={videoPage === Math.ceil(latestVideos.length / 3) - 1}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all 
+              duration-300 text-purple-400 hover:text-purple-600"
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
           </div>
         </div>
       </div>

@@ -163,7 +163,7 @@ export async function searchChannelsHybrid(query: string) {
 }
 
 // 채널 최신 영상 가져오는 함수
-export async function getChannelLatestVideos(channelId: string, maxResults: number = 5) {
+export async function getChannelLatestVideos(channelId: string, maxResults: number = 6) {
   try {
     const response = await fetch(
       `${YOUTUBE_API_BASE_URL}/search?` +

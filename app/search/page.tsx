@@ -17,6 +17,7 @@ function SearchResults() {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(false);
   const [sortType, setSortType] = useState<'default' | 'subscribers'>('default');
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     async function fetchChannels() {
@@ -35,8 +36,6 @@ function SearchResults() {
 
       try {
         const searchResults = await searchChannelsHybrid(keyword);
-        
-        // 이미 Channel 타입이므로 그대로 사용
         const validChannels = searchResults.filter((ch): ch is Channel => ch !== null);
   
         // 캐시에 결과 저장
@@ -83,37 +82,44 @@ function SearchResults() {
             ← 돌아가기
           </Link>
 
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-800">
                 {keyword ? `"${keyword}" 검색 결과` : '전체 채널'}
               </h1>
               <p className="text-gray-600 mt-2">
                 {loading ? '검색 중...' : `${filteredChannels.length}개의 채널을 찾았습니다`}
               </p>
-            </div>
 
-<div className='flex justify-end'>
-        {filteredChannels.length > 0 && !loading && (
-           <select
-              value={sortType}
-              onChange={(e) => setSortType(e.target.value as 'default' | 'subscribers')}
-              className="
-                px-4 py-2
-                bg-white/80 backdrop-blur-sm
-                border border-purple-200
-                rounded-xl
-                font-semibold
-                text-gray-600
-                focus:outline-none focus:ring-2 focus:ring-purple-400
-                shadow-sm shadow-purple-200
-              "
-            >
-              <option value="default">기본 순서</option>
-              <option value="subscribers">구독자 많은 순</option>
-            </select>
-          )}
-        </div>
+              {filteredChannels.length > 0 && !loading && (
+              <div className="relative mt-4">
+                <button
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="px-4 py-2 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-xl font-semibold text-gray-600 flex items-center gap-2 shadow-sm"
+                >
+                  {sortType === 'default' ? '기본 순서' : '구독자 많은 순'}
+                  <span>{isOpen ? '▲' : '▼'}</span>
+                </button>
+
+                {isOpen && (
+                  <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 z-50 w-40">
+                    <button
+                      onClick={() => { setSortType('default'); setIsOpen(false); }}
+                      className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-t-xl"
+                    >
+                      기본 순서
+                    </button>
+                    <button
+                      onClick={() => { setSortType('subscribers'); setIsOpen(false); }}
+                      className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
+                    >
+                      구독자 많은 순
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            </div>
         </div>
       </div>
 
@@ -197,7 +203,6 @@ function SearchResults() {
 
                 <div className="flex flex-col gap-2 text-sm text-gray-500">
                   <span>👥 구독자: {formatCount(channel.subscribers || 0)}</span>
-                  <span>👁️ 총 조회수: {formatCount(channel.averageViews || 0)}</span>
                 </div>
               </div>
               </Link>

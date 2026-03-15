@@ -64,6 +64,10 @@ export default function ChannelPage({ params }: ChannelPageProps) {
     return num.toString();
   };
 
+  const avgViews = latestVideos.length > 0
+  ? Math.round(latestVideos.slice(0, 5).reduce((sum, v) => sum + v.viewCount, 0) / Math.min(latestVideos.length, 5))
+  : 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 px-6 py-10">
       <div className="max-w-4xl mx-auto">
@@ -74,28 +78,40 @@ export default function ChannelPage({ params }: ChannelPageProps) {
           <ArrowLeft className="w-5 h-5 text-purple-600" />
         </button>
 
-        <h1 className="text-[] font-semibold text-black mb-8">
-          {channel.name}
-        </h1>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          {/* 왼쪽 썸네일 */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
-            {channel.thumbnail ? (
-              <img 
-                src={channel.thumbnail} 
+        {/* 모바일: 채널명 + 프로필 사진 */}
+          <div className="flex items-center gap-4 mb-8 lg:hidden">
+            {channel.thumbnail && (
+              <img
+                src={channel.thumbnail}
                 alt={channel.name}
-                className="w-full aspect-square object-cover rounded-2xl"
+                className="w-14 h-14 object-cover rounded-full flex-shrink-0"
               />
-            ) : (
-              <div className="bg-gray-100 aspect-square flex items-center justify-center rounded-2xl">
-                <div className="text-center">
-                  <div className="text-9xl mb-4">🎥</div>
-                  <p className="text-gray-500 text-lg font-medium">채널 썸네일</p>
-                </div>
-              </div>
             )}
+            <h1 className="font-semibold text-black">{channel.name}</h1>
           </div>
+
+          <h1 className="hidden lg:block font-semibold text-black mb-8">
+            {channel.name}
+          </h1>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            {/* 왼쪽 썸네일 - 모바일에서 숨김 */}
+            <div className="hidden lg:block bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
+              {channel.thumbnail ? (
+                <img
+                  src={channel.thumbnail}
+                  alt={channel.name}
+                  className="w-full aspect-square object-cover rounded-2xl"
+                />
+              ) : (
+                <div className="bg-gray-100 aspect-square flex items-center justify-center rounded-2xl">
+                  <div className="text-center">
+                    <div className="text-9xl mb-4">🎥</div>
+                    <p className="text-gray-500 text-lg font-medium">채널 썸네일</p>
+                  </div>
+                </div>
+              )}
+            </div>
 
         
         {/* 오른쪽 영역 */}
@@ -115,9 +131,9 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-lg text-gray-600">조회수</p>
+                  <p className="text-lg text-gray-600">조회수 (최근 5개 영상 기준)</p>
                   <p className="text-3xl font-bold text-black">
-                    {formatCount(channel.averageViews || 0)}
+                    {formatCount(avgViews || 0)}
                   </p>
                 </div>
               </div>

@@ -174,7 +174,28 @@ export async function getChannelLatestVideos(channelId: string, maxResults: numb
     if (!response.ok) throw new Error('YouTube API 호출 실패');
 
     const data = await response.json();
-    return data.items || [];
+    const items = data.items || [];
+
+      // 영상 id 목록 추출
+      const videoIds = items.map((item: any) => item.id.videoId).join(',');
+
+      if (!videoIds) return [];
+  
+      // 조회수 가져오기
+      const statsResponse = await fetch(
+        `${YOUTUBE_API_BASE_URL}/videos?` +
+        `part=statistics&id=${videoIds}&key=${YOUTUBE_API_KEY}`
+      );
+  
+      const statsData = await statsResponse.json();
+    // 조회수를 원본 아이템에 합치기
+    return items.map((item: any) => {
+      const stats = statsData.items?.find((s: any) => s.id === item.id.videoId);
+      return {
+        ...item,
+        viewCount: parseInt(stats?.statistics?.viewCount || '0'),
+      };
+    });
   } catch (error) {
     console.error('최신 영상 가져오기 에러:', error);
     return [];

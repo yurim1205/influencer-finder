@@ -28,7 +28,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="뷰티, 브이로그, 음악 등 키워드를 입력하세요"
+        placeholder="뷰티, 브이로그, 음악 등"
         className="
           w-full pl-12 pr-24 py-3 h-18
           bg-white backdrop-blur-lg

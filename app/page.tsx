@@ -41,14 +41,14 @@ export default function Home() {
           {tag.label}
         </span>
       ))}
-      <section className="mb-12 text-center pt-60">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text mb-16">
+      <section className="mb-12 text-center pt-60 px-6">
+        <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text mb-16">
            키워드로 원하는 채널을 탐색해보세요 ✨
         </h1>
       </section>
 
       <div className="flex flex-col items-center gap-6 py-10">
-        <div className="w-full max-w-3xl">
+        <div className="w-full max-w-3xl px-6">
           <SearchBar onSearch={handleSearch}/> 
         </div>
       </div>

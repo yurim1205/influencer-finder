@@ -1,5 +1,6 @@
 # Influencer-Finder
 유튜버 탐색과 비교를 돕는 키워드 기반 인플루언서 검색 서비스
+[서비스 링크](https://influencer-finder-eight.vercel.app/)
 
 ## 🧩 MVP 기능
 - 키워드 기반 유튜버 검색

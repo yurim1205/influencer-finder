@@ -7,7 +7,7 @@ import {
   Channel, searchChannelsHybrid 
 } from '@/lib/youtube';
 
-const searchCache = new Map<string, Channel[]>();
+const searchCache = new Map<string, { channels: Channel[]; nextPageToken: string | null }>();
 
 function SearchResults() {
   const searchParams = useSearchParams();
@@ -18,6 +18,8 @@ function SearchResults() {
   const [loading, setLoading] = useState(false);
   const [sortType, setSortType] = useState<'default' | 'subscribers'>('default');
   const [isOpen, setIsOpen] = useState(false);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     async function fetchChannels() {
@@ -26,21 +28,20 @@ function SearchResults() {
         return;
       } 
 
-      // 결과가 캐시에 있으면 바로 사용하기
       if (searchCache.has(keyword)) {
-        setChannels(searchCache.get(keyword) || []);
-        return; // 캐시 있으면 api 호출 안 하고 바로 사용함
+        const cached = searchCache.get(keyword)!;
+        setChannels(cached.channels);
+        setNextPageToken(cached.nextPageToken);
+        return;
       }
 
       setLoading(true);
 
       try {
-        const searchResults = await searchChannelsHybrid(keyword);
-        const validChannels = searchResults.filter((ch): ch is Channel => ch !== null);
-  
-        // 캐시에 결과 저장
-        searchCache.set(keyword, validChannels);
-        setChannels(validChannels);
+        const result = await searchChannelsHybrid(keyword);
+        searchCache.set(keyword, result);
+        setChannels(result.channels);
+        setNextPageToken(result.nextPageToken);
       } catch (error) {
         console.error('채널 검색 에러:', error);
         setChannels([]);
@@ -51,6 +52,23 @@ function SearchResults() {
 
     fetchChannels();
   }, [keyword]);
+
+  // 페이지네이션 더보기 함수
+  const handleLoadMore = async () => {
+    if (!nextPageToken || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const result = await searchChannelsHybrid(keyword, nextPageToken);
+      const merged = [...channels, ...result.channels];
+      setChannels(merged);
+      setNextPageToken(result.nextPageToken);
+      searchCache.set(keyword, { channels: merged, nextPageToken: result.nextPageToken });
+    } catch (error) {
+      console.error('더 보기 에러:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
   
   // 정렬
   const filteredChannels = [...channels]
@@ -145,6 +163,7 @@ function SearchResults() {
 
         {/* 검색 결과 출력 */}
         { filteredChannels.length > 0 && (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredChannels.map(channel => (
               <Link
@@ -208,10 +227,25 @@ function SearchResults() {
               </Link>
             ))}
           </div>
-        )}
-      </div>
-    </div>
-  ); }  
+
+          { /* 페이지네이션 더보기 버튼 */}
+          {nextPageToken && !loading && (
+            <div className="flex justify-center mt-10">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-8 py-3 bg-purple-600 text-white font-semibold rounded-2xl hover:bg-purple-700 disabled:opacity-50 transition-all"
+              >
+                {loadingMore ? '불러오는 중...' : '더 보기'}
+              </button>
+            </div>
+          )}
+          </>
+          )}
+          </div>
+          </div>
+  );
+}          
 
 export default function SearchPage() {
   return (

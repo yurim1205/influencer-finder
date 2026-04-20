@@ -16,7 +16,7 @@ function SearchResults() {
   // 상태 관리
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(false);
-  const [sortType, setSortType] = useState<'default' | 'subscribers'>('default');
+  const [sortType, setSortType] = useState<'default' | 'subscribers' | 'latest'>('default');
   const [isOpen, setIsOpen] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -78,6 +78,11 @@ function SearchResults() {
     if (sortType === 'subscribers') {
       return b.subscribers - a.subscribers;
     }
+    if (sortType === 'latest') {
+      const aDate = a.matchVideo?.publishedAt ?? '';
+      const bDate = b.matchVideo?.publishedAt ?? '';
+      return bDate.localeCompare(aDate);
+    }
     return 0;
   });
 
@@ -115,7 +120,7 @@ function SearchResults() {
                   onClick={() => setIsOpen(!isOpen)}
                   className="px-4 py-2 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-xl font-semibold text-gray-600 flex items-center gap-2 shadow-sm"
                 >
-                  {sortType === 'default' ? '기본 순서' : '구독자 많은 순'}
+                  {sortType === 'default' ? '기본 순서' : sortType === 'subscribers' ? '구독자 많은 순' : '최신순'}
                   <span>{isOpen ? '▲' : '▼'}</span>
                 </button>
 
@@ -127,11 +132,19 @@ function SearchResults() {
                     >
                       기본 순서
                     </button>
+
                     <button
                       onClick={() => { setSortType('subscribers'); setIsOpen(false); }}
                       className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
                     >
                       구독자 많은 순
+                    </button>
+                    
+                    <button
+                      onClick={() => { setSortType('latest'); setIsOpen(false); }}
+                      className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
+                    >
+                      최신순
                     </button>
                   </div>
                 )}

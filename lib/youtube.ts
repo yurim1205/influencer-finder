@@ -8,9 +8,11 @@ export interface Channel {
   averageViews: number; // 평균 조회수
   description: string; // 채널에 대한 설명
   thumbnail: string; // 채널 썸네일
+
   matchVideo?: {
     title: string;
     thumbnail: string;
+    publishedAt: string;
   }
 }
 
@@ -92,6 +94,7 @@ export async function searchChannelsByVideo(query: string) {
           matchedVideo: {
             title: item.snippet.title,
             thumbnail: item.snippet.thumbnails.medium.url,
+            publishedAt: item.snippet.publishedAt,
           }
         });
       }
@@ -126,7 +129,7 @@ export async function searchChannelsHybrid(
     const { items: channelSearchResults, nextPageToken } = await searchChannels(query, pageToken);
 
     // 영상 제목 검색
-    const videoResults = await searchChannelsByVideo(query);
+   const videoResults = await searchChannelsByVideo(query);
 
    const channelmap = new Map<string, Channel>();
 

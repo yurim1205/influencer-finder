@@ -14,25 +14,21 @@ export interface Channel {
   }
 }
 
+export interface SearchResult {
+  channels: Channel[];
+  nextPageToken: string|null;
+}
+
 // 채널 검색
-export async function searchChannels(query: string) {
-  try {
-    const response = await fetch(
-      `${YOUTUBE_API_BASE_URL}/search?` +
-      `part=snippet&type=channel&q=${encodeURIComponent(query)}&` +
-      `maxResults=10&key=${YOUTUBE_API_KEY}`
-    );
-
-    if (!response.ok) {
-      throw new Error('YouTube API 호출 실패');
-    }
-
-    const data = await response.json();
-    return data.items || [];
-  } catch (error) {
-    console.error('채널 검색 에러:', error);
-    return [];
-  }
+export async function searchChannels(query: string, pageToken: string|null = null) {
+  const response = await fetch(
+    `${YOUTUBE_API_BASE_URL}/search?` +
+    `part=snippet&type=channel&q=${encodeURIComponent(query)}&` +
+    `maxResults=10&key=${YOUTUBE_API_KEY}` +
+    (pageToken ? `&pageToken=${pageToken}` : '')
+  );
+  const data = await response.json();
+  return { items: data.items || [], nextPageToken: data.nextPageToken || null };
 }
 
 // 채널 상세 정보 가져오기
@@ -122,15 +118,17 @@ export async function searchChannelsByVideo(query: string) {
 }
 }
 
-export async function searchChannelsHybrid(query: string) {
+export async function searchChannelsHybrid(
+  query: string,
+  pageToken: string|null = null
+): Promise<SearchResult> {
   try {
-    // 채널명 검색
-    const channelSearchResults = await searchChannels(query);
+    const { items: channelSearchResults, nextPageToken } = await searchChannels(query, pageToken);
 
     // 영상 제목 검색
     const videoResults = await searchChannelsByVideo(query);
 
-   const channelmap = new Map();
+   const channelmap = new Map<string, Channel>();
 
    videoResults.forEach((channel: any) => {
     channelmap.set(channel.id, channel);
@@ -149,16 +147,19 @@ export async function searchChannelsHybrid(query: string) {
    });
 
    const channelResults = await Promise.all(channelDetailsPromises);
-   channelResults.forEach((channel: any) => {
+   channelResults.forEach((channel) => {
      if (channel && !channelmap.has(channel.id)) {
        channelmap.set(channel.id, channel);
      }
    });
 
-   return Array.from(channelmap.values()).slice(0, 10);[[]]
+    return {
+      channels: Array.from(channelmap.values()).slice(0, 10),
+      nextPageToken,
+    };
   } catch (error) {
     console.error('하이브리드 검색 에러:', error);
-    return [];
+    return { channels: [], nextPageToken: null };
   }
 }
 

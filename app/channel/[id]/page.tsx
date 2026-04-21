@@ -1,6 +1,6 @@
 'use client';
 
-import { convertToChannel, getChannelDetails, getChannelLatestVideos } from "@/lib/youtube";
+import { convertToChannel, getChannelDetails, getChannelLatestVideos, YoutubeVideo , Channel } from "@/lib/youtube";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -10,9 +10,9 @@ interface ChannelPageProps {
 }
 
 export default function ChannelPage({ params }: ChannelPageProps) {
-  const [channel, setChannel] = useState<any | null>(null);
+  const [channel, setChannel] = useState<Channel | null>(null);
   const [loading, setLoading] = useState(true);
-  const [latestVideos, setLatestVideos] = useState<any[]>([]);
+  const [latestVideos, setLatestVideos] = useState<YoutubeVideo[]>([]);
   const router = useRouter();
   const [videoPage, setVideoPage] = useState(0);    
   const videosPerPage = 3;

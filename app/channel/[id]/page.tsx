@@ -4,7 +4,7 @@ import { convertToChannel, getChannelDetails, getChannelLatestVideos, YoutubeVid
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { formatCount } from '@/lib/utils';
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
 }
@@ -56,13 +56,6 @@ export default function ChannelPage({ params }: ChannelPageProps) {
       </div>
     );
   }
-
-  const formatCount = (num: number) => {
-    if (num >= 100000000) return `${(num / 100000000).toFixed(0)}억`;
-    if (num >= 10000) return `${(num / 10000).toFixed(0)}만`;
-    if (num >= 1000) return `${(num / 1000).toFixed(0)}천`;
-    return num.toString();
-  };
 
   const avgViews = latestVideos.length > 0
   ? Math.round(latestVideos.slice(0, 5).reduce((sum, v) => sum + v.viewCount, 0) / Math.min(latestVideos.length, 5))

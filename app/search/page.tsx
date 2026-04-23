@@ -229,6 +229,7 @@ function SearchResults() {
 
                 <div className="flex flex-col gap-2 text-sm text-gray-500">
                   <span>👥 구독자: {formatCount(channel.subscribers || 0)}</span>
+                  <span className="text-purple-500 text-xs mt-1">📊 평균 조회수는 상세 페이지에서 확인하세요</span>
                 </div>
               </div>
               </Link>

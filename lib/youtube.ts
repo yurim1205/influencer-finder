@@ -212,7 +212,7 @@ export async function searchChannelsHybrid(
 }
 
 // 채널 최신 영상 가져오는 함수
-export async function getChannelLatestVideos(channelId: string, maxResults: number = 6): Promise<YoutubeVideo[]> {
+export async function getChannelLatestVideos(channelId: string, maxResults: number = 6) {
   try {
     const response = await fetch(
       `${YOUTUBE_API_BASE_URL}/search?` +
@@ -239,7 +239,7 @@ export async function getChannelLatestVideos(channelId: string, maxResults: numb
       const statsData = await statsResponse.json();
     // 조회수를 원본 아이템에 합치기
     return items.map((item: YoutubeVideo) => {
-      const stats = statsData.items?.find((s: YoutubeVideo) => s.id.videoId === item.id.videoId);
+      const stats = statsData.items?.find((s: { id: string; statistics: { viewCount: string } }) => s.id === item.id.videoId);
       return {
         ...item,
         viewCount: parseInt(stats?.statistics?.viewCount || '0'),

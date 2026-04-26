@@ -167,12 +167,30 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               ))}
             </div>
             
+             {/* 모바일: 아래 버튼 / 데스크탑: 양옆 버튼 */}
+            <div className="flex justify-center gap-4 mt-4 lg:hidden">
+              <button
+                onClick={() => setVideoPage((prev) => Math.max(prev - 1, 0))}
+                disabled={videoPage === 0}
+                className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+              >
+                <ChevronLeft className="w-8 h-8" />
+              </button>
+              <button
+                onClick={() => setVideoPage((prev) => Math.min(prev + 1, Math.ceil(latestVideos.length / 3) - 1))}
+                disabled={videoPage === Math.ceil(latestVideos.length / 3) - 1}
+                className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+              >
+                <ChevronRight className="w-8 h-8" />
+              </button>
+            </div>
+
             <button
               onClick={() => {
                 setVideoPage((prev) => Math.min(prev + 1, Math.ceil(latestVideos.length / 3) - 1));
               }}
               disabled={videoPage === Math.ceil(latestVideos.length / 3) - 1}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all 
+              className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all 
               duration-300 text-purple-400 hover:text-purple-600"
             >
               <ChevronRight className="w-8 h-8" />

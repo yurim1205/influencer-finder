@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { 
   Channel, searchChannelsHybrid 
 } from '@/lib/youtube';
+import { formatCount } from '@/lib/utils';
 
 const searchCache = new Map<string, { channels: Channel[]; nextPageToken: string | null }>();
 
@@ -86,13 +87,6 @@ function SearchResults() {
     return 0;
   });
 
-  const formatCount = (num: number) => {
-    if (num >= 100000000) return `${(num / 100000000).toFixed(0)}억`;
-    if (num >= 10000) return `${(num / 10000).toFixed(0)}만`;
-    if (num >= 1000) return `${(num / 1000).toFixed(0)}천`;
-    return num.toString();
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-8">
       <div className="max-w-7xl mx-auto">
@@ -139,7 +133,7 @@ function SearchResults() {
                     >
                       구독자 많은 순
                     </button>
-                    
+
                     <button
                       onClick={() => { setSortType('latest'); setIsOpen(false); }}
                       className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
@@ -235,6 +229,7 @@ function SearchResults() {
 
                 <div className="flex flex-col gap-2 text-sm text-gray-500">
                   <span>👥 구독자: {formatCount(channel.subscribers || 0)}</span>
+                  <span className="text-purple-500 text-xs mt-1">📊 평균 조회수는 상세 페이지에서 확인하세요</span>
                 </div>
               </div>
               </Link>

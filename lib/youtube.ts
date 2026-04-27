@@ -21,6 +21,51 @@ export interface SearchResult {
   nextPageToken: string|null;
 }
 
+export interface YoutubeVideo {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+    publishedAt: string;
+    channelId: string;
+    thumbnails: {
+      medium: {
+        url: string;
+      };
+    };
+  };
+  viewCount: number;
+}
+
+export interface YoutubeChannelData {
+  id: string;
+  snippet: {
+    title: string;
+    description: string;
+    thumbnails: {
+      high: { url: string };
+    };
+  };
+  statistics: {
+    subscriberCount: string;
+    viewCount: string;
+  };
+}
+
+export interface YoutubeSearchItem {
+  id: {
+    channelId: string;
+  };
+  snippet: {
+    title: string;
+    description: string;
+    thumbnails: {
+      high: { url: string };
+    };
+  };
+}
+
 // 채널 검색
 export async function searchChannels(query: string, pageToken: string|null = null) {
   const response = await fetch(
@@ -34,7 +79,7 @@ export async function searchChannels(query: string, pageToken: string|null = nul
 }
 
 // 채널 상세 정보 가져오기
-export async function getChannelDetails(channelId: string) {
+export async function getChannelDetails(channelId: string): Promise<YoutubeChannelData | null> {
   try {
     const response = await fetch(
       `${YOUTUBE_API_BASE_URL}/channels?` +
@@ -54,10 +99,10 @@ export async function getChannelDetails(channelId: string) {
 }
 
 // YouTube 데이터를 쓸 수 있는 타입으로 변환
-export function convertToChannel(youtubeChannel: any): Channel {
+export function convertToChannel(youtubeChannel: YoutubeChannelData): Channel {
   const channelId = typeof youtubeChannel.id === 'string' 
     ? youtubeChannel.id 
-    : youtubeChannel.id.channelId || youtubeChannel.id;
+    : (youtubeChannel.id as { channelId: string }).channelId || youtubeChannel.id;
     
   return {
     id: channelId,
@@ -84,9 +129,9 @@ export async function searchChannelsByVideo(query: string) {
     const data = await response.json();
 
   // 채널별로 첫 번째 매칭 영상 저장
-    const channelMap = new Map<string, any>();
+    const channelMap = new Map<string, { channelId: string; matchedVideo: { title: string; thumbnail: string; publishedAt: string } }>();
     
-    data.items.forEach((item: any) => {
+    data.items.forEach((item: YoutubeVideo) => {
       const channelId = item.snippet.channelId;
       if (!channelMap.has(channelId)) {
         channelMap.set(channelId, {
@@ -102,7 +147,7 @@ export async function searchChannelsByVideo(query: string) {
 
     const channelPromises = Array.from(channelMap.values())
     .slice(0, 10)
-    .map(async (item) => {
+    .map(async (item: { channelId: string; matchedVideo: { title: string; thumbnail: string; publishedAt: string } }) => {
       const details = await getChannelDetails(item.channelId);
       if (details) {
         const channel = convertToChannel(details);
@@ -133,13 +178,13 @@ export async function searchChannelsHybrid(
 
    const channelmap = new Map<string, Channel>();
 
-   videoResults.forEach((channel: any) => {
+   videoResults.forEach((channel: Channel) => {
     channelmap.set(channel.id, channel);
    });
 
    // channelSearchResults도 상세 정보로 변환
-   const channelDetailsPromises = channelSearchResults.map(async (item: any) => {
-     const channelId = item.id.channelId || item.id;
+   const channelDetailsPromises = channelSearchResults.map(async (item: YoutubeSearchItem) => {
+     const channelId = item.id.channelId;
      if (typeof channelId === 'string' && !channelmap.has(channelId)) {
        const details = await getChannelDetails(channelId);
        if (details) {
@@ -150,7 +195,7 @@ export async function searchChannelsHybrid(
    });
 
    const channelResults = await Promise.all(channelDetailsPromises);
-   channelResults.forEach((channel) => {
+   channelResults.forEach((channel: Channel) => {
      if (channel && !channelmap.has(channel.id)) {
        channelmap.set(channel.id, channel);
      }
@@ -181,7 +226,7 @@ export async function getChannelLatestVideos(channelId: string, maxResults: numb
     const items = data.items || [];
 
       // 영상 id 목록 추출
-      const videoIds = items.map((item: any) => item.id.videoId).join(',');
+      const videoIds = items.map((item: YoutubeVideo) => item.id.videoId).join(',');
 
       if (!videoIds) return [];
   
@@ -193,8 +238,8 @@ export async function getChannelLatestVideos(channelId: string, maxResults: numb
   
       const statsData = await statsResponse.json();
     // 조회수를 원본 아이템에 합치기
-    return items.map((item: any) => {
-      const stats = statsData.items?.find((s: any) => s.id === item.id.videoId);
+    return items.map((item: YoutubeVideo) => {
+      const stats = statsData.items?.find((s: { id: string; statistics: { viewCount: string } }) => s.id === item.id.videoId);
       return {
         ...item,
         viewCount: parseInt(stats?.statistics?.viewCount || '0'),

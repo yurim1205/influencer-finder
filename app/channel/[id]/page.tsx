@@ -1,18 +1,18 @@
 'use client';
 
-import { convertToChannel, getChannelDetails, getChannelLatestVideos } from "@/lib/youtube";
+import { convertToChannel, getChannelDetails, getChannelLatestVideos, YoutubeVideo , Channel } from "@/lib/youtube";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
+import { formatCount } from '@/lib/utils';
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
 }
 
 export default function ChannelPage({ params }: ChannelPageProps) {
-  const [channel, setChannel] = useState<any | null>(null);
+  const [channel, setChannel] = useState<Channel | null>(null);
   const [loading, setLoading] = useState(true);
-  const [latestVideos, setLatestVideos] = useState<any[]>([]);
+  const [latestVideos, setLatestVideos] = useState<YoutubeVideo[]>([]);
   const router = useRouter();
   const [videoPage, setVideoPage] = useState(0);    
   const videosPerPage = 3;
@@ -56,13 +56,6 @@ export default function ChannelPage({ params }: ChannelPageProps) {
       </div>
     );
   }
-
-  const formatCount = (num: number) => {
-    if (num >= 100000000) return `${(num / 100000000).toFixed(0)}억`;
-    if (num >= 10000) return `${(num / 10000).toFixed(0)}만`;
-    if (num >= 1000) return `${(num / 1000).toFixed(0)}천`;
-    return num.toString();
-  };
 
   const avgViews = latestVideos.length > 0
   ? Math.round(latestVideos.slice(0, 5).reduce((sum, v) => sum + v.viewCount, 0) / Math.min(latestVideos.length, 5))
@@ -174,12 +167,30 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               ))}
             </div>
             
+             {/* 모바일: 아래 버튼 / 데스크탑: 양옆 버튼 */}
+            <div className="flex justify-center gap-4 mt-4 lg:hidden">
+              <button
+                onClick={() => setVideoPage((prev) => Math.max(prev - 1, 0))}
+                disabled={videoPage === 0}
+                className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+              >
+                <ChevronLeft className="w-8 h-8" />
+              </button>
+              <button
+                onClick={() => setVideoPage((prev) => Math.min(prev + 1, Math.ceil(latestVideos.length / 3) - 1))}
+                disabled={videoPage === Math.ceil(latestVideos.length / 3) - 1}
+                className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+              >
+                <ChevronRight className="w-8 h-8" />
+              </button>
+            </div>
+
             <button
               onClick={() => {
                 setVideoPage((prev) => Math.min(prev + 1, Math.ceil(latestVideos.length / 3) - 1));
               }}
               disabled={videoPage === Math.ceil(latestVideos.length / 3) - 1}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all 
+              className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all 
               duration-300 text-purple-400 hover:text-purple-600"
             >
               <ChevronRight className="w-8 h-8" />

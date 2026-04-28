@@ -119,14 +119,14 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               <div className="space-y-4">
                 <div>
                   <p className="text-lg text-gray-600">구독자</p>
-                  <p className="text-3xl font-bold text-black">
+                  <p className="text-xl font-bold text-black">
                     {formatCount(channel.subscribers || 0)}
                   </p>
                 </div>
                 <div>
                   <p className="text-lg text-gray-600">조회수 (최근 5개 영상 기준)</p>
-                  <p className="text-3xl font-bold text-black">
-                    {formatCount(avgViews || 0)}
+                  <p className="text-xl font-bold text-black">
+                  {latestVideos.length > 0 ? formatCount(avgViews || 0) : '이 채널은 영상 정보를 제공하지 않습니다'}
                   </p>
                 </div>
               </div>
@@ -139,6 +139,11 @@ export default function ChannelPage({ params }: ChannelPageProps) {
             채널의 최신 영상
           </h2>
           
+          {latestVideos.length === 0 ? (
+            <div className="text-center py-10 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200">
+              <p className="text-gray-500 font-bold text-xl">이 채널은 영상 정보를 제공하지 않습니다</p>
+            </div>
+          ) : (
           <div className="relative">
           <button
             onClick={() => {
@@ -196,6 +201,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               <ChevronRight className="w-8 h-8" />
             </button>
           </div>
+        )}
         </div>
       </div>
     </div>

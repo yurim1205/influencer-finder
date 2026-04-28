@@ -242,7 +242,10 @@ function SearchResults() {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-8 py-3 bg-purple-600 text-white font-semibold rounded-2xl hover:bg-purple-700 disabled:opacity-50 transition-all"
+                className="px-8 py-3 bg-white/80 backdrop-blur-sm border border-gray-200 text-purple-600 font-semibold rounded-2xl 
+                hover:bg-purple-50 disabled:opacity-50 transition-all
+                shadow-lg shadow-purple-500/30
+                "
               >
                 {loadingMore ? '불러오는 중...' : '더 보기'}
               </button>

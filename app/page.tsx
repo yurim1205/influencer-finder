@@ -22,37 +22,36 @@ export default function Home() {
   return (
     <>
     <Toaster position="top-center" />
-    <main className="relative bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 min-h-screen">
-        {[
-        { label: '#뷰티', top: '12%', left: '15%' },
-        { label: '#게임', bottom: '42%', right: '8%' },
-        { label: '#음악', top: '58%', left: '5%' },
-        { label: '#요리', bottom: '20%', right: '15%' },
-        { label: '#여행', top: '75%', left: '20%' },
-        { label: '#패션', top: '30%', right: '3%' },
-        { label: '#운동', bottom: '10%', left: '8%' },
-        { label: '#브이로그', top: '15%', right: '19%' },
-      ].map((tag, i) => (
-          <span
-          key={i}
-          className="absolute px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800 shadow-lg shadow-black/10 pointer-events-none select-none opacity-60"
-          style={{ top: tag.top, left: tag.left, right: tag.right, bottom: tag.bottom }}
-        >
-          {tag.label}
-        </span>
-      ))}
-      <section className="mb-12 text-center pt-60 px-6">
-        <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text mb-16">
-           키워드로 원하는 채널을 탐색해보세요 ✨
-        </h1>
-      </section>
+    <main className="relative bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 min-h-screen flex flex-col items-center justify-center px-6">
+    <div className="flex flex-wrap justify-center gap-2 mb-10 opacity-60 max-w-xs">
+    {[
+  { label: '#뷰티', top: '12%', left: '15%' },
+  { label: '#게임', top: '20%', right: '8%' },
+  { label: '#음악', top: '58%', left: '5%' },
+  { label: '#요리', bottom: '20%', right: '15%' },
+  { label: '#여행', top: '75%', left: '20%' },
+  { label: '#패션', top: '35%', right: '3%' },
+  { label: '#운동', bottom: '10%', left: '8%' },
+  { label: '#브이로그', top: '15%', right: '19%' },
+].map((tag, i) => (
+  <span
+    key={i}
+    className="hidden sm:block absolute px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800 shadow-lg shadow-black/10 pointer-events-none select-none opacity-60"
+    style={{ top: tag.top, left: tag.left, right: tag.right, bottom: tag.bottom }}
+  >
+    {tag.label}
+  </span>
+))}
+</div>
 
-      <div className="flex flex-col items-center gap-6 py-10">
-        <div className="w-full max-w-3xl px-6">
-          <SearchBar onSearch={handleSearch}/> 
-        </div>
-      </div>
-    </main>
+    <h1 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text mb-10 text-center">
+      키워드로 원하는 채널을 탐색해보세요 ✨
+    </h1>
+
+    <div className="w-full max-w-3xl">
+      <SearchBar onSearch={handleSearch}/> 
+    </div>
+  </main>
     </>
   )
 }

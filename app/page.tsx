@@ -25,11 +25,11 @@ export default function Home() {
     <main className="relative bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 min-h-screen">
         {[
         { label: '#뷰티', top: '12%', left: '15%' },
-        { label: '#게임', top: '20%', right: '8%' },
+        { label: '#게임', bottom: '42%', right: '8%' },
         { label: '#음악', top: '58%', left: '5%' },
         { label: '#요리', bottom: '20%', right: '15%' },
         { label: '#여행', top: '75%', left: '20%' },
-        { label: '#패션', top: '35%', right: '3%' },
+        { label: '#패션', top: '30%', right: '3%' },
         { label: '#운동', bottom: '10%', left: '8%' },
         { label: '#브이로그', top: '15%', right: '19%' },
       ].map((tag, i) => (

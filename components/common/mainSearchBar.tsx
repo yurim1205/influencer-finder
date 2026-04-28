@@ -30,7 +30,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         onKeyDown={handleKeyDown}
         placeholder="뷰티, 브이로그, 음악 등"
         className="
-          w-full pl-12 pr-24 py-3 h-18
+          w-full pl-6 pr-24 py-3 h-18
           bg-white backdrop-blur-lg
           border border-white/20
           rounded-4xl

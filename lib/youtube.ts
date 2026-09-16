@@ -213,19 +213,19 @@ export async function searchChannelsHybrid(
   videoPageToken: string|null = null,
 ): Promise<SearchResult> {
   try {
-    // 1. 채널명 검색 - channelPageToken으로 다음 페이지 요청
-    const { items: channelSearchResults, nextPageToken: nextChannelPageToken, totalResults } = 
-      await searchChannels(query, channelPageToken);
+  const [
+    { items: channelSearchResults, nextPageToken: nextChannelPageToken, totalResults } ,
+    { channels: videoResults, nextPageToken: nextVideoPageToken} ,
+  ] = await Promise.all([
+      searchChannels(query, channelPageToken),
+      searchChannelsByVideo(query, videoPageToken),
+    ]);
 
-    // 2. 영상 제목 검색 - videoPageToken으로 다음 페이지 요청
-   const {channels: videoResults, nextPageToken: nextVideoPageToken} = 
-    await searchChannelsByVideo(query, videoPageToken)
-
-   const channelmap = new Map<string, Channel>();
-
-   videoResults.forEach((channel: Channel) => {
-    channelmap.set(channel.id, channel);
-   });
+    const channelmap = new Map<string, Channel>();
+    videoResults.forEach((channel: Channel)=>{
+      channelmap.set(channel.id, channel);
+    })
+    
 
    // 검색 결과에 이미 있는 채널은 제외하고, 새로 조회할 채널 id만 추림
    const newChannelIds = channelSearchResults

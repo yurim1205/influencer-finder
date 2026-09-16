@@ -68,6 +68,10 @@ export interface YoutubeSearchItem {
   };
 }
 
+
+const channelDetailsCache = new Map<string, YoutubeChannelData>(); // 채널 id 단위 캐시 (같은 세션 내에서 중복 조회 방지)
+
+
 // 채널 검색 함수
 export async function searchChannels(query: string, pageToken: string|null = null) {
   try {
@@ -96,6 +100,12 @@ export async function searchChannels(query: string, pageToken: string|null = nul
 
 // 채널 상세 정보 가져오기
 export async function getChannelDetails(channelId: string): Promise<YoutubeChannelData | null> {
+
+  // 캐시에 있으면 바로 반환
+  if (channelDetailsCache.has(channelId)) {
+    return channelDetailsCache.get(channelId) !;
+  }
+
   try {
     const response = await fetch(
       `${YOUTUBE_API_BASE_URL}/channels?` +
@@ -103,25 +113,48 @@ export async function getChannelDetails(channelId: string): Promise<YoutubeChann
     );
 
     if (!response.ok) {
-      throw new Error('YouTube API 호출 실패');
+      throw new Error('api 호출 실패');
     }
 
     const data = await response.json();
-    return data.items?.[0] || null;
+    const channelData = data.items?.[0] || null;
+
+    // 조회 성공하면 캐시에 저장
+    if (channelData) {
+      channelDetailsCache.set(channelId, channelData);
+    }
+
+    return channelData;
   } catch (error) {
     console.error('채널 상세 정보 에러:', error);
     return null;
   }
 }
 
-// 여러 채널 상세 정보를 한 번에 가져오기 (최대 50개)
 export async function getChannelsDetailsBatch(channelIds: string[]): Promise<YoutubeChannelData[]> {
   if (channelIds.length === 0) return [];
+
+  const cached: YoutubeChannelData[] = [];
+  const idsToFetch: string[] = [];
+
+  channelIds.forEach((id)=> {
+    const hit= channelDetailsCache.get(id);
+    if (hit) {
+      cached.push(hit);
+    } else {
+      idsToFetch.push(id);
+    }
+  })
+
+  // 캐시에 데이터가 있어서 api 호출이 불필요하면 api 호출을 생략
+  if (idsToFetch.length === 0) {
+    return cached;
+  }
 
   try {
     const response = await fetch(
       `${YOUTUBE_API_BASE_URL}/channels?` +
-      `part=snippet,statistics&id=${channelIds.join(',')}&key=${YOUTUBE_API_KEY}`
+      `part=snippet,statistics&id=${idsToFetch.join(',')}&key=${YOUTUBE_API_KEY}`
     );
 
     if (!response.ok) {
@@ -129,10 +162,18 @@ export async function getChannelsDetailsBatch(channelIds: string[]): Promise<You
     }
 
     const data = await response.json();
-    return data.items || [];
+    const fetched: YoutubeChannelData[] = data.items || [];
+
+    // 새로 받아온 것들 캐시에 저장
+    fetched.forEach((item) => {
+      channelDetailsCache.set(item.id, item);
+    })
+
+    // 캐시에서 꺼낸 것 + 새로 받아온 것 합쳐서 반환
+    return [...cached, ...fetched];
   } catch (error) {
     console.error('채널 상세 정보 배치 에러:', error);
-    return [];
+    return cached; // 
   }
 }
 
@@ -169,7 +210,14 @@ export async function searchChannelsByVideo(query: string, pageToken: string|nul
     const data = await response.json();
 
   // 채널별로 첫 번째 매칭 영상 저장
-    const channelMap = new Map<string, { channelId: string; matchedVideo: { title: string; thumbnail: string; publishedAt: string } }>();
+    const channelMap = new Map<string, { 
+      channelId: string; 
+      matchedVideo: { 
+        title: string; 
+        thumbnail: string; 
+        publishedAt: string 
+      } 
+    }>();
     
     data.items.forEach((item: YoutubeVideo) => {
       const channelId = item.snippet.channelId;

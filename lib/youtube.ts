@@ -70,6 +70,7 @@ export interface YoutubeSearchItem {
 
 // 채널 검색 함수
 export async function searchChannels(query: string, pageToken: string|null = null) {
+  try {
   const response = await fetch(
     `${YOUTUBE_API_BASE_URL}/search?` +
     `part=snippet&type=channel&q=${encodeURIComponent(query)}&` +
@@ -77,12 +78,20 @@ export async function searchChannels(query: string, pageToken: string|null = nul
     (pageToken ? `&pageToken=${pageToken}` : '')       // 페이지 토큰 사용
   );
 
+  if (!response.ok) {
+    throw new Error('api 호출 실패');
+  }
+
   const data = await response.json();
   return { 
     items: data.items || [],
     nextPageToken: data.nextPageToken || null,
     totalResults: data.pageInfo?.totalResults || 0
   };
+} catch (error) {
+  console.error('채널명 검색 에러:', error);
+  return {items: [], nextPageToken: null, totalResults: 0};
+  }
 }
 
 // 채널 상세 정보 가져오기
@@ -225,7 +234,7 @@ export async function searchChannelsHybrid(
     videoResults.forEach((channel: Channel)=>{
       channelmap.set(channel.id, channel);
     })
-    
+
 
    // 검색 결과에 이미 있는 채널은 제외하고, 새로 조회할 채널 id만 추림
    const newChannelIds = channelSearchResults

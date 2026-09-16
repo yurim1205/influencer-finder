@@ -105,6 +105,28 @@ export async function getChannelDetails(channelId: string): Promise<YoutubeChann
   }
 }
 
+// 여러 채널 상세 정보를 한 번에 가져오기 (최대 50개)
+export async function getChannelsDetailsBatch(channelIds: string[]): Promise<YoutubeChannelData[]> {
+  if (channelIds.length === 0) return [];
+
+  try {
+    const response = await fetch(
+      `${YOUTUBE_API_BASE_URL}/channels?` +
+      `part=snippet,statistics&id=${channelIds.join(',')}&key=${YOUTUBE_API_KEY}`
+    );
+
+    if (!response.ok) {
+      throw new Error('YouTube API 호출 실패');
+    }
+
+    const data = await response.json();
+    return data.items || [];
+  } catch (error) {
+    console.error('채널 상세 정보 배치 에러:', error);
+    return [];
+  }
+}
+
 // YouTube 데이터를 쓸 수 있는 타입으로 변환
 export function convertToChannel(youtubeChannel: YoutubeChannelData): Channel {
   const channelId = typeof youtubeChannel.id === 'string' 
@@ -154,30 +176,36 @@ export async function searchChannelsByVideo(query: string, pageToken: string|nul
       }
     });
 
-    const channelPromises = Array.from(channelMap.values())
-    .slice(0, 10)
-    .map(async (item: { channelId: string; matchedVideo: { title: string; thumbnail: string; publishedAt: string } }) => {
-      const details = await getChannelDetails(item.channelId);
-      if (details) {
-        const channel = convertToChannel(details);
-        // 매칭 영상 정보 추가
-        channel.matchVideo = item.matchedVideo;
-        return channel;
-      }
-      return null;
-    });
+    const matchedEntries = Array.from(channelMap.values()).slice(0, 10);
+    const channelIds = matchedEntries.map((item) => item.channelId);
+    const detailsList = await getChannelsDetailsBatch(channelIds);
 
-  const channels = await Promise.all(channelPromises);
-  return {
-    channels: channels.filter(ch => ch !== null),
-    nextPageToken: data.nextPageToken || null,         // 다음 페이지 토큰 돌려줌
-    totalResults: data.pageInfo?.totalResults || 0,
+    const detailsById = new Map(detailsList.map((d) => [d.id, d]));
+
+    const channels = matchedEntries
+    .map((item) => {
+      const details = detailsById.get(item.channelId);
+      if (!details) return null;
+      const channel = convertToChannel(details);
+      channel.matchVideo = item.matchedVideo;
+      return channel;
+    })
+    .filter((ch): ch is Channel => ch !== null);
+
+    return {
+      channels,
+      nextPageToken: data.nextPageToken || null,
+      totalResults: data.pageInfo?.totalResults || 0,
+    };
+  } catch (error) {
+    console.error('영상 검색 에러:', error);
+    return {
+      channels: [],
+      nextPageToken: null,
+      totalResults: 0
+    };
   }
-} catch (error) {
-  console.error('영상 검색 에러:', error);
-  return { channels: [], nextPageToken: null, totalResults: 0 };
-  }
-}
+ }   
 
 export async function searchChannelsHybrid(
   query: string,
@@ -199,19 +227,14 @@ export async function searchChannelsHybrid(
     channelmap.set(channel.id, channel);
    });
 
-   // channelSearchResults도 상세 정보로 변환
-   const channelDetailsPromises = channelSearchResults.map(async (item: YoutubeSearchItem) => {
-     const channelId = item.id.channelId;
-     if (typeof channelId === 'string' && !channelmap.has(channelId)) {
-       const details = await getChannelDetails(channelId);
-       if (details) {
-         return convertToChannel(details);
-       }
-     }
-     return null;
-   });
+   // 검색 결과에 이미 있는 채널은 제외하고, 새로 조회할 채널 id만 추림
+   const newChannelIds = channelSearchResults
+     .map((item: YoutubeSearchItem) => item.id.channelId)
+     .filter((id: string) => typeof id === 'string' && !channelmap.has(id));
 
-   const channelResults = await Promise.all(channelDetailsPromises);
+   const newDetailsList = await getChannelsDetailsBatch(newChannelIds);
+   const channelResults = newDetailsList.map((details) => convertToChannel(details));
+
    channelResults.forEach((channel: Channel) => {
      if (channel && !channelmap.has(channel.id)) {
        channelmap.set(channel.id, channel);

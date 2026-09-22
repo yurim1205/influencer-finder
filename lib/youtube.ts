@@ -233,7 +233,8 @@ export async function searchChannelsByVideo(query: string, pageToken: string|nul
       }
     });
 
-    const matchedEntries = Array.from(channelMap.values()).slice(0, 10);
+    const matchedEntries = Array.from(channelMap.values());
+
     const channelIds = matchedEntries.map((item) => item.channelId);
     const detailsList = await getChannelsDetailsBatch(channelIds);
 
@@ -299,7 +300,7 @@ export async function searchChannelsHybrid(
    });
 
     return {
-      channels: Array.from(channelmap.values()).slice(0, 10),
+      channels: Array.from(channelmap.values()),
       nextChannelPageToken,
       nextVideoPageToken,
       totalResults,

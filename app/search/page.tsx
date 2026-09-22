@@ -157,7 +157,7 @@ function SearchResults() {
                     <span className="text-gray-600">검색 중...</span>
                   ) : (
                     <span className="text-lg font-bold text-purple-600">
-                      총 {searchResult.totalResults.toLocaleString()}개의 채널
+                      총 {filteredChannels.length.toLocaleString()}개 채널 확인 중
                     </span>
                   )}
               </p>

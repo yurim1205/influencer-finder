@@ -3,22 +3,25 @@
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
-import { 
-  Channel, searchChannelsHybrid 
-} from '@/lib/youtube';
+import { Channel, searchChannelsHybrid } from '@/lib/youtube';
 import { formatCount } from '@/lib/utils';
 
-const searchCache = new Map<string, { channels: Channel[]; nextPageToken: string | null, totalResults: number }>();
+const searchCache = new Map<string, {
+   channels: Channel[]; 
+   nextChannelPageToken: string | null;
+   nextVideoPageToken: string | null;
+   totalResults: number;
+  }>();
 
 function SearchResults() {
   const searchParams = useSearchParams();
   const keyword = searchParams.get('keyword') || ''; // url 파라미터 이름 받는 부분
 
-  // 상태 관리
   const [searchResult, setSearchResult] = useState({
     channels: [] as Channel[],
     totalResults: 0,
-    nextPageToken: null as string | null,
+    nextChannelPageToken: null as string | null,
+    nextVideoPageToken: null as string | null,
   });
   
   const [loadingState, setLoadingState] = useState({
@@ -35,7 +38,8 @@ function SearchResults() {
         setSearchResult({
           channels: [],
           totalResults: 0,
-          nextPageToken: null,
+          nextChannelPageToken: null,
+          nextVideoPageToken: null,
         });
         return;
       } 
@@ -45,7 +49,8 @@ function SearchResults() {
         setSearchResult({
           channels: cached.channels,
           totalResults: cached.totalResults,
-          nextPageToken: cached.nextPageToken,
+          nextChannelPageToken: cached.nextChannelPageToken,
+          nextVideoPageToken: cached.nextVideoPageToken,
         });
         return;
       }
@@ -56,20 +61,23 @@ function SearchResults() {
         const result = await searchChannelsHybrid(keyword);
         searchCache.set(keyword, { 
           channels: result.channels, 
-          nextPageToken: result.nextPageToken, 
+          nextChannelPageToken: result.nextChannelPageToken,
+          nextVideoPageToken: result.nextVideoPageToken,
           totalResults: result.totalResults 
         });
         setSearchResult({
           channels: result.channels,
           totalResults: result.totalResults,
-          nextPageToken: result.nextPageToken,
+          nextChannelPageToken: result.nextChannelPageToken,
+          nextVideoPageToken: result.nextVideoPageToken,
         });
       } catch (error) {
         console.error('채널 검색 에러:', error);
         setSearchResult({
           channels: [],
           totalResults: 0,
-          nextPageToken: null,
+          nextChannelPageToken: null,
+          nextVideoPageToken: null,
         });
       } finally {
         setLoadingState({ loading: false, loadingMore: false });
@@ -79,19 +87,30 @@ function SearchResults() {
     fetchChannels();
   }, [keyword]);
 
-  // 페이지네이션 더보기 함수
+
+  // 데이터 더보기 함수
   const handleLoadMore = async () => {
-    if (!searchResult.nextPageToken || loadingState.loadingMore) return;
+    if ((!searchResult.nextChannelPageToken && !searchResult.nextVideoPageToken) || loadingState.loadingMore) return;
     setLoadingState({ loading: true, loadingMore: true });
     try {
-      const result = await searchChannelsHybrid(keyword, searchResult.nextPageToken);
+      const result = await searchChannelsHybrid(
+        keyword, 
+        searchResult.nextChannelPageToken, 
+        searchResult.nextVideoPageToken
+      );
       const merged = [...searchResult.channels, ...result.channels];
       setSearchResult({
         channels: merged,
         totalResults: result.totalResults,
-        nextPageToken: result.nextPageToken,
+        nextChannelPageToken: result.nextChannelPageToken,
+        nextVideoPageToken: result.nextVideoPageToken,
       });
-      searchCache.set(keyword, { channels: merged, nextPageToken: result.nextPageToken, totalResults: result.totalResults });
+      searchCache.set(keyword, { 
+        channels: merged, 
+        nextChannelPageToken: result.nextChannelPageToken,
+        nextVideoPageToken: result.nextVideoPageToken,
+        totalResults: result.totalResults 
+      });
     } catch (error) {
       console.error('더 보기 에러:', error);
     } finally {
@@ -99,6 +118,7 @@ function SearchResults() {
     }
   };
   
+
   // 정렬
   const filteredChannels = [...searchResult.channels]
   .filter((channel, index, self) =>
@@ -273,7 +293,7 @@ function SearchResults() {
           </div>
 
           { /* 페이지네이션 더보기 버튼 */}
-          {searchResult.nextPageToken && !loadingState.loading && (
+          {(searchResult.nextChannelPageToken || searchResult.nextVideoPageToken) && !loadingState.loading && (
             <div className="flex justify-center mt-10">
               {loadingState.loadingMore ? (
                 <div className="flex flex-col items-center gap-3">

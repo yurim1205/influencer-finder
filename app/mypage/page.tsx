@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import {useRouter} from 'next/navigation';
 import {useAuthStore} from '@/app/stores/useAuthStore';
 import { supabase } from '@/lib/supabase';
-import Modal from '@/components/Modal';
+import Modal from '@/components/myPageModal';
 import {createPortal} from 'react-dom';
 
 interface MyInfluencer {
@@ -98,14 +98,15 @@ export default function MyPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isSortOpen]);
 
-  // 탭 필터 → 검색 필터 → 정렬 순으로 처리
-  const filteredData = influencers
-    .filter((item) => activeTab === '전체' || item.contact_status === activeTab)
-    .filter((item) => item.name.toLowerCase().includes(searchKeyword.toLowerCase()))
-    .sort((a, b) => {
-      if (sortType === 'subscribers') return b.subscribers - a.subscribers;
-      return b.avg_views - a.avg_views;
-    });
+  const filteredData = useMemo(()=> {
+    return influencers
+      .filter((item) => activeTab === '전체' || item.contact_status === activeTab)
+      .filter((item) => item.name.toLowerCase().includes(searchKeyword.toLowerCase()))
+      .sort((a, b) => {
+        if (sortType === 'subscribers') return b.subscribers - a.subscribers;
+        return b.avg_views - a.avg_views;
+      });
+    }, [influencers, activeTab, searchKeyword, sortType]);
 
   const formatCount = (num: number) => {
     if (num >= 10000) return `${(num / 10000).toFixed(1)}만`;

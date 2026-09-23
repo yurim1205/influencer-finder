@@ -1,3 +1,7 @@
+'use client';
+
+import {decodeHtmlEntities} from '@/lib/utils';
+
 const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
 const YOUTUBE_API_BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
@@ -185,8 +189,8 @@ export function convertToChannel(youtubeChannel: YoutubeChannelData): Channel {
     
   return {
     id: channelId,
-    name: youtubeChannel.snippet.title,
-    description: youtubeChannel.snippet.description,
+    name: decodeHtmlEntities(youtubeChannel.snippet.title), 
+    description: decodeHtmlEntities(youtubeChannel.snippet.description),
     subscribers: parseInt(youtubeChannel.statistics?.subscriberCount || '0'),
     averageViews: parseInt(youtubeChannel.statistics?.viewCount || '0'),
     thumbnail: youtubeChannel.snippet.thumbnails.high.url,
@@ -225,7 +229,7 @@ export async function searchChannelsByVideo(query: string, pageToken: string|nul
         channelMap.set(channelId, {
           channelId,
           matchedVideo: {
-            title: item.snippet.title,
+            title: decodeHtmlEntities(item.snippet.title),
             thumbnail: item.snippet.thumbnails.medium.url,
             publishedAt: item.snippet.publishedAt,
           }

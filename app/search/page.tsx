@@ -87,29 +87,57 @@ function SearchResults() {
     fetchChannels();
   }, [keyword]);
 
+  
+  const MAX_EMPTY_RETRIES = 2; // 새 채널 없이 최대 몇 번까지 자동으로 더 시도할지
 
-  // 데이터 더보기 함수
   const handleLoadMore = async () => {
     if ((!searchResult.nextChannelPageToken && !searchResult.nextVideoPageToken) || loadingState.loadingMore) return;
     setLoadingState({ loading: true, loadingMore: true });
+  
     try {
-      const result = await searchChannelsHybrid(
-        keyword, 
-        searchResult.nextChannelPageToken, 
-        searchResult.nextVideoPageToken
-      );
-      const merged = [...searchResult.channels, ...result.channels];
+      let currentChannels = searchResult.channels;
+      let channelToken = searchResult.nextChannelPageToken;
+      let videoToken = searchResult.nextVideoPageToken;
+      let latestTotalResults = searchResult.totalResults;
+      let attempt = 0;
+  
+      while (true) {
+        const result = await searchChannelsHybrid(keyword, channelToken, videoToken);
+        latestTotalResults = result.totalResults;
+  
+        const merged = [...currentChannels, ...result.channels]
+          .filter((channel, index, self) => index === self.findIndex((ch) => ch.id === channel.id));
+  
+        const hasNewChannels = merged.length > currentChannels.length;
+        currentChannels = merged;
+        channelToken = result.nextChannelPageToken;
+        videoToken = result.nextVideoPageToken;
+  
+        const hasMoreToken = channelToken || videoToken;
+  
+        // 새 채널을 찾았거나, 더 가져올 페이지 자체가 없으면 멈춤
+        if (hasNewChannels || !hasMoreToken) break;
+  
+        // 새 채널이 없는데 페이지는 남아있는 경우 → 재시도 횟수 체크
+        attempt++;
+        if (attempt >= MAX_EMPTY_RETRIES) {
+          channelToken = null;
+          videoToken = null;
+          break;
+        }
+      }
+  
       setSearchResult({
-        channels: merged,
-        totalResults: result.totalResults,
-        nextChannelPageToken: result.nextChannelPageToken,
-        nextVideoPageToken: result.nextVideoPageToken,
+        channels: currentChannels,
+        totalResults: latestTotalResults,
+        nextChannelPageToken: channelToken,
+        nextVideoPageToken: videoToken,
       });
-      searchCache.set(keyword, { 
-        channels: merged, 
-        nextChannelPageToken: result.nextChannelPageToken,
-        nextVideoPageToken: result.nextVideoPageToken,
-        totalResults: result.totalResults 
+      searchCache.set(keyword, {
+        channels: currentChannels,
+        nextChannelPageToken: channelToken,
+        nextVideoPageToken: videoToken,
+        totalResults: latestTotalResults,
       });
     } catch (error) {
       console.error('더 보기 에러:', error);
@@ -293,14 +321,14 @@ function SearchResults() {
           </div>
 
           { /* 페이지네이션 더보기 버튼 */}
-          {(searchResult.nextChannelPageToken || searchResult.nextVideoPageToken) && !loadingState.loading && (
+          {!loadingState.loading && (
             <div className="flex justify-center mt-10">
               {loadingState.loadingMore ? (
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
                   <p className="text-sm text-gray-500">채널을 불러오는 중...</p>
                 </div>
-              ) : (
+              ) : searchResult.nextChannelPageToken || searchResult.nextVideoPageToken ? (
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingState.loadingMore}
@@ -310,13 +338,15 @@ function SearchResults() {
                 >
                   더 보기
                 </button>
+              ) : (
+                <p className="text-sm text-gray-400">모든 검색 결과를 확인했습니다</p>
               )}
             </div>
           )}
           </>
           )}
           </div>
-          </div>
+        </div>
   );
 }          
 

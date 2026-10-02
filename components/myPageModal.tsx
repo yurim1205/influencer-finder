@@ -9,9 +9,15 @@ interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSaved: () => void;
+    initialData?: {
+        name?: string;
+        subscribers?: string;
+        avgViews?: string;
+        intro?: string;
+    };
 }
 
-export default function Modal({ isOpen, onClose, onSaved }: ModalProps) {
+export default function Modal({ isOpen, onClose, onSaved, initialData }: ModalProps) {
     const [formData, setFormData] = useState({
         name: '',
         subscribers: '',
@@ -25,6 +31,22 @@ export default function Modal({ isOpen, onClose, onSaved }: ModalProps) {
 
     const user = useAuthStore((state)=> state.user);
     const [isSaving, setIsSaving] = useState(false);
+
+    // 추가: 모달이 열릴 때 initialData로 폼 채우기 (또는 빈 값으로 리셋)
+    useEffect(() => {
+        if (!isOpen) return;
+
+        setFormData({
+            name: initialData?.name || '',
+            subscribers: initialData?.subscribers || '',
+            avgViews: initialData?.avgViews || '',
+            gender: 'M',
+            intro: initialData?.intro || '',
+            contactPoint: '',
+            contactNote: '',
+            contactStatus: '미컨택',
+        });
+    }, [isOpen, initialData]);
 
      const inputClass =
       'h-[42px] rounded-full border border-[#c6c1c1] bg-[#f5f3f6] px-5 text-[16px] text-black outline-none focus:border-[#4B5563] transition-all';

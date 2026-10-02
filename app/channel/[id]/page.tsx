@@ -5,6 +5,8 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatCount } from '@/lib/utils';
+import Modal from "@/components/myPageModal";
+import { useAuthStore } from "@/app/stores/useAuthStore";
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
 }
@@ -15,6 +17,8 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   const [latestVideos, setLatestVideos] = useState<YoutubeVideo[]>([]);
   const router = useRouter();
   const [videoPage, setVideoPage] = useState(0);    
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
   const videosPerPage = 3;
   useEffect(() => {
     async function fetchChannel() {
@@ -137,6 +141,20 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                   </p>
                 </div>
               </div>
+
+              <button
+                onClick={() => {
+                  if (!user) {
+                    router.push('/login');
+                    return;
+                  }
+                  setIsModalOpen(true);
+                }}
+                className="mt-6 w-full px-4 py-3 bg-[#6A4F6A] text-white font-semibold rounded-xl
+                hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
+              >
+                + 마이페이지에 저장
+              </button>
             </div>
           </div> 
         </div> 

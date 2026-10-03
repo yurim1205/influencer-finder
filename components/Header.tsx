@@ -5,7 +5,7 @@ import {useState, useRef, useEffect} from 'react';
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { X, User, LogOut, ChevronDown } from 'lucide-react';
+import { X, User, LogOut } from 'lucide-react';
 
 export default function Header() {
     const user = useAuthStore((state) => state.user);
@@ -45,19 +45,15 @@ export default function Header() {
         <div className="absolute top-0 right-0 p-6 flex items-center gap-3 z-50">
             {user ? (
                 <div className="group relative" ref={menuRef}>
-                  <button
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="flex items-center gap-2 text-gray-800 font-medium hover:cursor-pointer rounded-full 
-                        px-2 py-1.5 transition-all hover:bg-[#F8F4FA] hover:ring-1 hover:ring-[#E8DCEA]"
-                    >
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8DCEA] text-[#6A4F6A] 
-                          text-xs font-semibold transition-colors">
-                                {(user.user_metadata?.name ?? user.email ?? '?').charAt(0).toUpperCase()}
-                          </div>
-                         {/* 사용자명 표시*/}
-                         {/* {user.user_metadata?.name ?? user.email}님 */}
-                         <ChevronDown className="h-4 w-4 text-gray-500" />
-                    </button>
+                 <button
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="rounded-full transition-all hover:shadow-md hover:cursor-pointer"
+                >
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#6A4F6A] text-white
+                    text-sm font-semibold">
+                        {(user.user_metadata?.name ?? user.email ?? '?').charAt(0).toUpperCase()}
+                    </div>
+                </button>
 
                     {/* 툴팁 - 드롭다운 열려있지 않을 때만 보이게 */}
                     {!isMenuOpen && (

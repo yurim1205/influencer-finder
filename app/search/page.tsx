@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { Channel, searchChannelsHybrid } from '@/lib/youtube';
 import { formatCount } from '@/lib/utils';
+import { ChevronDown } from 'lucide-react';
 
 const searchCache = new Map<string, {
    channels: Channel[]; 
@@ -197,32 +198,42 @@ function SearchResults() {
                   className="px-4 py-2 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-xl font-semibold text-gray-600 flex items-center gap-2 shadow-sm"
                 >
                   {sortType === 'default' ? '관련도순' : sortType === 'subscribers' ? '구독자 많은 순' : '최신순'}
-                  <span>{isOpen ? '▲' : '▼'}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 {isOpen && (
-                  <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 z-50 w-40">
-                    <button
-                      onClick={() => { setSortType('default'); setIsOpen(false); }}
-                      className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-t-xl"
-                    >
-                      관련도순
-                    </button>
+                  <>
+                    <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setIsOpen(false)}
+                    />
 
-                    <button
-                      onClick={() => { setSortType('subscribers'); setIsOpen(false); }}
-                      className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
-                    >
-                      구독자 많은 순
-                    </button>
+                    <div className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-lg border 
+                    border-gray-200 z-50 w-40">
+                      <button
+                        onClick={() => { setSortType('default'); setIsOpen(false); }}
+                        className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-t-xl"
+                      >
+                        관련도순
+                      </button>
 
-                    <button
-                      onClick={() => { setSortType('latest'); setIsOpen(false); }}
-                      className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
-                    >
-                      최신순
-                    </button>
-                  </div>
+                      <button
+                        onClick={() => { setSortType('subscribers'); setIsOpen(false); }}
+                        className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
+                      >
+                        구독자 많은 순
+                      </button>
+
+                      <button
+                        onClick={() => { setSortType('latest'); setIsOpen(false); }}
+                        className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
+                      >
+                        최신순
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
             )}

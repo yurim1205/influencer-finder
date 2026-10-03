@@ -122,25 +122,27 @@ export default function ChannelPage({ params }: ChannelPageProps) {
         <div className="flex flex-col gap-6">
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
               <h2 className="text-base text-gray-700 mb-4">채널 설명</h2>
-              <p className="text-base text-gray-700 leading-relaxed text-xl font-semibold text-black line-clamp-5">
-                {channel.description || '채널 설명이 없습니다.'}
-              </p>
+                <p className="text-black leading-relaxed text-lg font-medium whitespace-pre-line line-clamp-6">
+                  {(channel.description || '채널 설명이 없습니다.').replace(/\n{2,}/g, '\n')}
+                </p>
             </div>
+
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
-              <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-lg text-gray-600">구독자</p>
-                  <p className="text-xl font-semibold text-black">
+                  <p className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">구독자</p>
+                  <p className="text-2xl font-bold text-black">
                     {formatCount(channel.subscribers || 0)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-lg text-gray-600">조회수 (최근 5개 영상 기준)</p>
-                  <p className="text-xl font-semibold text-black">
-                  {latestVideos.length > 0 ? formatCount(avgViews || 0) : '이 채널은 영상 정보를 제공하지 않습니다'}
+                  <p className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">조회수 (최근 5개 영상)</p>
+                  <p className="text-2xl font-bold text-black">
+                    {latestVideos.length > 0 ? formatCount(avgViews || 0) : '이 채널은 영상 정보를 제공하지 않습니다'}
                   </p>
                 </div>
               </div>
+            </div>
 
               <button
                 onClick={() => {
@@ -150,8 +152,9 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                   }
                   setIsModalOpen(true);
                 }}
-                className="mt-6 w-full px-4 py-3 bg-[#6A4F6A] text-white font-semibold rounded-xl
-                hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
+                className="w-full px-4 py-4 bg-[#6A4F6A] text-white font-semibold rounded-2xl
+                hover:-translate-y-1 hover:shadow-lg transition-all duration-300
+                flex items-center justify-center gap-2 shadow-md shadow-gray-400/50"
               >
                 + 마이페이지에 저장
               </button>
@@ -229,6 +232,5 @@ export default function ChannelPage({ params }: ChannelPageProps) {
         )}
         </div>
       </div>
-    </div>
   );
 }

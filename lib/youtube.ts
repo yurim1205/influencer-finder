@@ -24,7 +24,6 @@ export interface SearchResult {
   channels: Channel[];
   nextChannelPageToken: string|null;
   nextVideoPageToken: string|null;
-  totalResults: number;
 }
 
 export interface YoutubeVideo {
@@ -72,9 +71,7 @@ export interface YoutubeSearchItem {
   };
 }
 
-
 const channelDetailsCache = new Map<string, YoutubeChannelData>(); // 채널 id 단위 캐시 (같은 세션 내에서 중복 조회 방지)
-
 
 // 채널 검색 함수
 export async function searchChannels(query: string, pageToken: string|null = null) {
@@ -94,11 +91,10 @@ export async function searchChannels(query: string, pageToken: string|null = nul
   return { 
     items: data.items || [],
     nextPageToken: data.nextPageToken || null,
-    totalResults: data.pageInfo?.totalResults || 0
   };
 } catch (error) {
   console.error('채널명 검색 에러:', error);
-  return {items: [], nextPageToken: null, totalResults: 0};
+  return {items: [], nextPageToken: null};
   }
 }
 
@@ -257,14 +253,12 @@ export async function searchChannelsByVideo(query: string, pageToken: string|nul
     return {
       channels,
       nextPageToken: data.nextPageToken || null,
-      totalResults: data.pageInfo?.totalResults || 0,
     };
   } catch (error) {
     console.error('영상 검색 에러:', error);
     return {
       channels: [],
       nextPageToken: null,
-      totalResults: 0
     };
   }
  }   
@@ -276,7 +270,7 @@ export async function searchChannelsHybrid(
 ): Promise<SearchResult> {
   try {
   const [
-    { items: channelSearchResults, nextPageToken: nextChannelPageToken, totalResults } ,
+    { items: channelSearchResults, nextPageToken: nextChannelPageToken } ,
     { channels: videoResults, nextPageToken: nextVideoPageToken} ,
   ] = await Promise.all([
       searchChannels(query, channelPageToken),
@@ -307,11 +301,10 @@ export async function searchChannelsHybrid(
       channels: Array.from(channelmap.values()),
       nextChannelPageToken,
       nextVideoPageToken,
-      totalResults,
     };
   } catch (error) {
     console.error('하이브리드 검색 에러:', error);
-    return { channels: [], nextChannelPageToken: null, nextVideoPageToken: null, totalResults: 0 };
+    return { channels: [], nextChannelPageToken: null, nextVideoPageToken: null};
   }
 }
 

@@ -13,7 +13,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   // 부모 함수에 검색 키워드 전달
   const handleSearch = () => {
     onSearch(searchQuery); // searchQuery: 사용자가 입력한 검색 키워드임
-  };;
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -22,7 +22,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   };
 
   return (
-    <div className="rounded-2xl relative w-full flex items-center h-12">
+    <div className="relative w-full flex items-center">
       <input
         type="text"
         value={searchQuery}
@@ -30,35 +30,25 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         onKeyDown={handleKeyDown}
         placeholder="검색어를 입력해주세요"
         className="
-          w-full pl-6 pr-24 py-3 h-18
-          bg-white backdrop-blur-lg
-          border border-white/20
-          rounded-4xl
-          text-gray-800
-          placeholder-gray-400 font-semibold
-          focus:outline-none focus:ring-2 focus:ring-white/30
-          shadow-lg shadow-black/10
+          w-full h-14 lg:h-16 
+          pl-6 pr-16 lg:pl-8 lg:pr-20
+          bg-white rounded-full
+          text-base font-medium text-gray-800
+          placeholder:text-[#a9a9a9]
+          shadow-[0px_30px_60px_0px_rgba(0,0,0,0.1)]
+          focus:outline-none focus:ring-2 focus:ring-[#6A4F6A]/20
           transition-all duration-300
         "
       />
-      
+    
       <button
         type="button"
         onClick={handleSearch}
-        className="
-          absolute right-4
-          w-10 h-10
-          bg-[#6A4F6A]
-          rounded-2xl
-          flex items-center justify-center
-          hover:-translate-y-1 hover:shadow-lg transition-all duration-300
-          active:bg-purple-800
-          transition-all duration-200
-          shadow-lg shadow-black/30
-        "
+        aria-label="검색"
+        className="absolute right-5 text-black hover:text-[#6A4F6A] transition-colors cursor-pointer"
       >
-        <Search className="w-5 h-5 text-white" />
+        <Search className="w-5 h-5 lg:w-6 lg:h-6" />
       </button>
-    </div>
+  </div>
   );
 }

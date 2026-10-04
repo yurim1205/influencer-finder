@@ -8,6 +8,7 @@ import {useAuthStore} from '@/app/stores/useAuthStore';
 import { supabase } from '@/lib/supabase';
 import Modal from '@/components/myPageModal';
 import {createPortal} from 'react-dom';
+import { ChevronDown } from 'lucide-react';
 
 interface MyInfluencer {
   id: string;
@@ -152,7 +153,7 @@ export default function MyPage() {
                 className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 flex items-center gap-2"
               >
                 정렬: {SORT_OPTIONS.find((o) => o.value === sortType)?.label}
-                <span>{isSortOpen ? '▲' : '▼'}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {isSortOpen && createPortal(
@@ -167,7 +168,8 @@ export default function MyPage() {
                                       setSortType(option.value);
                                       setIsSortOpen(false);
                                   }}
-                                  className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 first:rounded-t-xl last:rounded-b-xl"
+                                  className="w-full px-4 py-3 text-left text-sm text-gray-600 hover:bg-purple-50 first:rounded-t-xl 
+                                  last:rounded-b-xl"
                               >
                                   {option.label}
                               </button>
@@ -183,7 +185,7 @@ export default function MyPage() {
               onChange={(e) => setSearchKeyword(e.target.value)}
               placeholder="이름으로 검색해주세요"
               className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 
-              focus:ring-purple-200 w-56"
+              focus:ring-purple-200 w-56 text-gray-600"
             />
             
             {/******* 항목 추가 버튼 ********/}

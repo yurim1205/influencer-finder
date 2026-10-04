@@ -118,7 +118,7 @@ export default function MyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 px-6 py-10">
+    <div className="min-h-screen bg-page-gradient px-6 py-10">
       <Header />
       <div className="max-w-6xl mx-auto">
       <Link href="/" className="text-xl font-bold text-gray-500">

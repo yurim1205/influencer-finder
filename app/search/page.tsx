@@ -98,7 +98,8 @@ function SearchResults() {
         const result = await searchChannelsHybrid(keyword, channelToken, videoToken);
   
         const merged = [...currentChannels, ...result.channels]
-          .filter((channel, index, self) => index === self.findIndex((ch) => ch.id === channel.id));
+          .filter((channel, index, self) => 
+            index === self.findIndex((ch) => ch.id === channel.id));
   
         const hasNewChannels = merged.length > currentChannels.length;
         currentChannels = merged;
@@ -139,8 +140,6 @@ function SearchResults() {
 
   // 정렬
   const filteredChannels = [...searchResult.channels]
-  .filter((channel, index, self) =>
-     index === self.findIndex((ch) => ch.id === channel.id))
   .sort((a, b) => {
     if (sortType === 'subscribers') {
       return b.subscribers - a.subscribers;
@@ -154,7 +153,7 @@ function SearchResults() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-8">
+    <div className="min-h-screen bg-page-gradient p-8">
       <div className="max-w-7xl mx-auto">
         {/* 상단 헤더 */}
         <div className="mb-8">

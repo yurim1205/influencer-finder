@@ -11,7 +11,6 @@ const searchCache = new Map<string, {
    channels: Channel[]; 
    nextChannelPageToken: string | null;
    nextVideoPageToken: string | null;
-   totalResults: number;
   }>();
 
 function SearchResults() {
@@ -20,7 +19,6 @@ function SearchResults() {
 
   const [searchResult, setSearchResult] = useState({
     channels: [] as Channel[],
-    totalResults: 0,
     nextChannelPageToken: null as string | null,
     nextVideoPageToken: null as string | null,
   });
@@ -38,7 +36,6 @@ function SearchResults() {
       if (!keyword) {
         setSearchResult({
           channels: [],
-          totalResults: 0,
           nextChannelPageToken: null,
           nextVideoPageToken: null,
         });
@@ -49,7 +46,6 @@ function SearchResults() {
         const cached = searchCache.get(keyword)!;
         setSearchResult({
           channels: cached.channels,
-          totalResults: cached.totalResults,
           nextChannelPageToken: cached.nextChannelPageToken,
           nextVideoPageToken: cached.nextVideoPageToken,
         });
@@ -64,11 +60,9 @@ function SearchResults() {
           channels: result.channels, 
           nextChannelPageToken: result.nextChannelPageToken,
           nextVideoPageToken: result.nextVideoPageToken,
-          totalResults: result.totalResults 
         });
         setSearchResult({
           channels: result.channels,
-          totalResults: result.totalResults,
           nextChannelPageToken: result.nextChannelPageToken,
           nextVideoPageToken: result.nextVideoPageToken,
         });
@@ -76,7 +70,6 @@ function SearchResults() {
         console.error('채널 검색 에러:', error);
         setSearchResult({
           channels: [],
-          totalResults: 0,
           nextChannelPageToken: null,
           nextVideoPageToken: null,
         });
@@ -99,12 +92,10 @@ function SearchResults() {
       let currentChannels = searchResult.channels;
       let channelToken = searchResult.nextChannelPageToken;
       let videoToken = searchResult.nextVideoPageToken;
-      let latestTotalResults = searchResult.totalResults;
       let attempt = 0;
   
       while (true) {
         const result = await searchChannelsHybrid(keyword, channelToken, videoToken);
-        latestTotalResults = result.totalResults;
   
         const merged = [...currentChannels, ...result.channels]
           .filter((channel, index, self) => index === self.findIndex((ch) => ch.id === channel.id));
@@ -130,7 +121,6 @@ function SearchResults() {
   
       setSearchResult({
         channels: currentChannels,
-        totalResults: latestTotalResults,
         nextChannelPageToken: channelToken,
         nextVideoPageToken: videoToken,
       });
@@ -138,7 +128,6 @@ function SearchResults() {
         channels: currentChannels,
         nextChannelPageToken: channelToken,
         nextVideoPageToken: videoToken,
-        totalResults: latestTotalResults,
       });
     } catch (error) {
       console.error('더 보기 에러:', error);

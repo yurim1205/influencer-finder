@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function SignupCompletePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-page-gradient flex items-center justify-center px-6">
       <div className="bg-white/30 backdrop-blur-md rounded-3xl p-12 w-full max-w-lg shadow-sm border border-white/50 text-center">
         <h1 className="text-3xl font-bold text-gray-800 mb-4 font-['Carlito']">
           Welcome!

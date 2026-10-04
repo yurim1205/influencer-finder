@@ -26,3 +26,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.bg-page-gradient {
+  background-image: linear-gradient(
+    to bottom,
+    #fff4f2 19.304%,
+    #f1e8f1 58.413%,
+    #ebe8f7 92.788%
+  );
+}

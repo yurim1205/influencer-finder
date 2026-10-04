@@ -52,7 +52,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex">
+    <div className="min-h-screen bg-page-gradient flex">
       
       {/* 왼쪽 영역 */}
       <div className="flex flex-col justify-between p-10 w-1/2">

@@ -154,7 +154,7 @@ function SearchResults() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 p-8">
+    <div className="min-h-screen bg-page-gradient p-8">
       <div className="max-w-7xl mx-auto">
         {/* 상단 헤더 */}
         <div className="mb-8">

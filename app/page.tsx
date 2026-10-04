@@ -26,8 +26,7 @@ export default function Home() {
     <>
     <Toaster position="top-center" />
     <Header />
-    <main className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-[12vh]
-      bg-gradient-to-b from-[#fff4f2] from-[19.304%] via-[#f1e8f1] via-[58.413%] to-[#ebe8f7] to-[92.788%]">
+    <main className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-[12vh] bg-page-gradient">
       <h1 className="mb-16 lg:mb-28 text-center text-2xl sm:text-3xl lg:text-4xl font-medium text-black">
         키워드로 원하는 채널을 탐색해보세요
       </h1>

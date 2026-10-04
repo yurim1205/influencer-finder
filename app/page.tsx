@@ -20,36 +20,36 @@ export default function Home() {
       router.push(`/search?keyword=${encodeURIComponent(keyword)}`);
   };
 
-  const categories = ['#뷰티', '#게임', '#음악', '#요리', '#여행', '#패션', '#운동', '#브이로그'];
+  const categories = ['#뷰티', '#게임', '#음악', '#요리', '#여행', '#브이로그'];
 
   return (
     <>
     <Toaster position="top-center" />
     <Header />
-      <main className="relative bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 min-h-screen flex flex-col items-center justify-center px-6">
-        <h1 className="text-md sm:text-3xl font-semibold text-gray-800 mb-10 text-center">
-          키워드로 원하는 채널을 탐색해보세요 ✨
-        </h1>
+    <main className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-[12vh]
+      bg-gradient-to-b from-[#fff4f2] from-[19.304%] via-[#f1e8f1] via-[58.413%] to-[#ebe8f7] to-[92.788%]">
+      <h1 className="mb-16 lg:mb-28 text-center text-2xl sm:text-3xl lg:text-4xl font-medium text-black">
+        키워드로 원하는 채널을 탐색해보세요
+      </h1>
 
-        <div className="w-full max-w-3xl">
-          <SearchBar onSearch={handleSearch}/>
+      <div className="w-full max-w-3xl">
+        <SearchBar onSearch={handleSearch} />
 
-          {/* 카테고리 탭 */}
-          <div className="flex flex-wrap gap-2 mt-8 justify-center">
-            {categories.map((category, i) => (
-              <button
-                key={i}
-                onClick={() => handleSearch(category.replace('#', ''))}
-                className="px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-800 
-                shadow-lg shadow-black/10 hover:bg-purple-100 hover:text-purple-600 
-                transition-all duration-200 cursor-pointer"
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+        <div className="mt-6 flex flex-wrap justify-center gap-3 lg:gap-4">
+          {categories.map((category, i) => (
+            <button
+              key={i}
+              onClick={() => handleSearch(category.replace('#', ''))}
+              className="h-10 lg:h-12 px-5 lg:px-6 text-sm lg:text-base 
+              rounded-full bg-white text-[#3f3f3f]
+              transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+            >
+              {category}
+            </button>
+          ))}
         </div>
-      </main>
+      </div>
+    </main>
     </>
   )
 }

@@ -113,10 +113,13 @@ export default function Header() {
                 </div>
             ) : (
                 <>
-                    <Link href="/login" className="text-gray-500 font-semibold hover:text-purple-600 transition-colors">
+                    <Link href="/login" className="text-sm lg:text-lg font-medium text-[#3f3f3f] hover:text-black 
+                    transition-colors">
                         로그인
                     </Link>
-                    <Link href="/signup" className="text-gray-500 font-semibold hover:text-purple-800 transition-colors">
+                    <span className="text-sm lg:text-lg text-[#3f3f3f]">|</span>
+                    <Link href="/signup" className="text-sm lg:text-lg font-medium text-[#3f3f3f] hover:text-black 
+                    transition-colors">
                         회원가입
                     </Link>
                 </>

@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { Channel, searchChannelsHybrid } from '@/lib/youtube';
 import { formatCount } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
+import Header from '@/components/Header';
 
 const searchCache = new Map<string, {
    channels: Channel[]; 
@@ -154,8 +155,8 @@ function SearchResults() {
 
   return (
     <div className="min-h-screen bg-page-gradient p-8">
+      <Header />
       <div className="max-w-7xl mx-auto">
-        {/* 상단 헤더 */}
         <div className="mb-8">
           <Link 
             href="/"

@@ -237,7 +237,7 @@ export default function MyPage() {
 
                   <span className="text-sm text-gray-500 truncate">
                     <span className="md:hidden">컨택 포인트: </span>
-                    {item.contact_email || '-'}
+                    {item.contact_point || '-'}
                   </span>
 
                   <span>

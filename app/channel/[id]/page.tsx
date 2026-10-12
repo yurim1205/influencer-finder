@@ -8,6 +8,8 @@ import { formatCount } from '@/lib/utils';
 import { useAuthStore } from "@/app/stores/useAuthStore";
 import {supabase} from '@/lib/supabase';
 import { Toaster, toast } from 'react-hot-toast';
+import Header from "@/components/Header";
+
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
 }
@@ -127,13 +129,14 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   return (
     <div className="min-h-screen bg-page-gradient px-6 py-10">
        <Toaster position="top-center" />
-      <div className="max-w-6xl mx-auto">
-        <button
-          onClick={() => router.back()}
-          className="text-purple-600 hover:text-purple-800 mb-6 inline-block font-semibold"
-        >
-          <ArrowLeft className="w-5 h-5 text-purple-600" />
-        </button>
+       <Header />
+        <div className="max-w-6xl mx-auto">
+          <button
+            onClick={() => router.back()}
+            className="text-purple-600 hover:text-purple-800 mb-6 inline-block font-semibold"
+          >
+            <ArrowLeft className="w-5 h-5 text-purple-600" />
+          </button>
 
         {/* 모바일: 채널명 + 프로필 사진 */}
           <div className="flex items-center gap-4 mb-8 lg:hidden">

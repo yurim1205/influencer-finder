@@ -336,9 +336,14 @@ export async function getChannelLatestVideos(channelId: string, maxResults: numb
       const statsData = await statsResponse.json();
     // 조회수를 원본 아이템에 합치기
     return items.map((item: YoutubeVideo) => {
-      const stats = statsData.items?.find((s: { id: string; statistics: { viewCount: string } }) => s.id === item.id.videoId);
+      const stats = statsData.items?.find((s: { 
+        id: string; statistics: { viewCount: string } }) => s.id === item.id.videoId);
       return {
         ...item,
+        snippet: {
+          ...item.snippet,
+          title: decodeHtmlEntities(item.snippet.title),
+        },
         viewCount: parseInt(stats?.statistics?.viewCount || '0'),
       };
     });

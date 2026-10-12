@@ -127,7 +127,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   return (
     <div className="min-h-screen bg-page-gradient px-6 py-10">
        <Toaster position="top-center" />
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <button
           onClick={() => router.back()}
           className="text-purple-600 hover:text-purple-800 mb-6 inline-block font-semibold"
@@ -218,7 +218,6 @@ export default function ChannelPage({ params }: ChannelPageProps) {
             </button>
             </div>
           </div> 
-        </div> 
 
         <div className="mt-14">
           <h2 className="text-xl font-bold text-black mb-6">
@@ -288,6 +287,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
             </button>
           </div>
         )}
+        </div>
         </div>
       </div>
   );

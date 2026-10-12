@@ -5,8 +5,9 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatCount } from '@/lib/utils';
-import Modal from "@/components/myPageModal";
 import { useAuthStore } from "@/app/stores/useAuthStore";
+import {supabase} from '@/lib/supabase';
+import { Toaster, toast } from 'react-hot-toast';
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
 }
@@ -17,9 +18,11 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   const [latestVideos, setLatestVideos] = useState<YoutubeVideo[]>([]);
   const router = useRouter();
   const [videoPage, setVideoPage] = useState(0);    
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const user = useAuthStore((state) => state.user);
   const videosPerPage = 3;
+
   useEffect(() => {
     async function fetchChannel() {
       const { id } = await params;
@@ -34,6 +37,23 @@ export default function ChannelPage({ params }: ChannelPageProps) {
     }
     fetchChannel();
   }, []);
+
+  useEffect(() => {
+    if (!user || !channel) return;
+  
+    const checkSaved = async () => {
+      const { data } = await supabase
+        .from('my_influencers')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('channel_id', channel.id)
+        .maybeSingle();
+  
+      setIsSaved(!!data);
+    };
+  
+    checkSaved();
+  }, [user, channel]);
 
   if (loading) {
     return (
@@ -65,8 +85,48 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   ? Math.round(latestVideos.slice(0, 5).reduce((sum, v) => sum + v.viewCount, 0) / Math.min(latestVideos.length, 5))
   : 0;
 
+  const handleSave = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    if (isSaving) return;
+  
+    setIsSaving(true);
+    const { data, error } = await supabase
+      .from('my_influencers')
+      .insert({
+        user_id: user.id,
+        channel_id: channel.id,
+        name: channel.name,
+        subscribers: channel.subscribers || 0,
+        avg_views: avgViews || 0,
+        description: channel.description || '',
+        gender: 'M',         
+        contact_point: '',
+        contact_note: '',
+        contact_status: '미컨택',
+        note: '',
+      })
+      .select();
+    setIsSaving(false);
+  
+    if (error) {
+      if (error.code === '23505') {
+        setIsSaved(true);
+        toast('이미 저장된 채널이에요');
+      } else {
+        toast.error('저장에 실패했습니다.');
+      }
+      return;
+    }
+    setIsSaved(true);
+    toast.success('마이페이지에 저장되었습니다');
+  };
+
   return (
     <div className="min-h-screen bg-page-gradient px-6 py-10">
+       <Toaster position="top-center" />
       <div className="max-w-4xl mx-auto">
         <button
           onClick={() => router.back()}
@@ -144,20 +204,18 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               </div>
             </div>
 
-              <button
-                onClick={() => {
-                  if (!user) {
-                    router.push('/login');
-                    return;
-                  }
-                  setIsModalOpen(true);
-                }}
-                className="w-full px-4 py-4 bg-[#6A4F6A] text-white font-semibold rounded-2xl
-                hover:-translate-y-1 hover:shadow-lg transition-all duration-300
-                flex items-center justify-center gap-2 shadow-md shadow-gray-400/50"
-              >
-                + 마이페이지에 저장
-              </button>
+            <button
+              onClick={handleSave}
+              disabled={isSaving || isSaved}
+              className={`w-full px-4 py-4 font-semibold rounded-2xl transition-all duration-300
+                flex items-center justify-center gap-2
+                ${isSaved
+                  ? 'bg-white/80 text-[#6A4F6A] border border-[#6A4F6A]/30 cursor-default'
+                  : 'bg-[#6A4F6A] text-white hover:-translate-y-1 hover:shadow-lg shadow-md shadow-gray-400/50'}
+                disabled:opacity-60`}
+            >
+              {isSaving ? '저장 중...' : isSaved ? '✓ 저장됨' : '+ 마이페이지에 저장'}
+            </button>
             </div>
           </div> 
         </div> 

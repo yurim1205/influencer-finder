@@ -8,7 +8,8 @@ import {useAuthStore} from '@/app/stores/useAuthStore';
 import { supabase } from '@/lib/supabase';
 import Modal from '@/components/myPageModal';
 import {createPortal} from 'react-dom';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface MyInfluencer {
   id: string;
@@ -69,6 +70,25 @@ export default function MyPage() {
       }
       setDataLoading(false);
     };
+
+    const handleDelete = async (id: string) => {
+      if (!user) return;
+      if (!window.confirm('이 항목을 삭제할까요?')) return;
+    
+      const { error } = await supabase
+        .from('my_influencers')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+    
+      if (error) {
+        console.error('삭제 오류:', error);
+        toast.error('삭제에 실패했습니다.');
+        return;
+      }
+      toast.success('삭제되었습니다');
+      fetchInfluencers();
+    };
     
     useEffect(()=> {
       if (user) {
@@ -121,6 +141,7 @@ export default function MyPage() {
   return (
     <div className="min-h-screen bg-page-gradient px-6 py-10">
       <Header />
+      <Toaster position="top-center" />
       <div className="max-w-6xl mx-auto">
       <Link href="/" className="text-xl font-bold text-gray-500">
           Influencer Finder
@@ -213,11 +234,12 @@ export default function MyPage() {
               <span>평균조회수</span>
               <span>컨택 포인트</span>
               <span>컨택 이력</span>
+              <span></span>
             </div>
 
             {filteredData.map((item) => (
               <div key={item.id} className="border-b border-gray-100 last:border-b-0 px-6 py-4">
-                <div className="grid grid-cols-1 md:grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr] gap-2 md:gap-4 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr_80px] gap-2 md:gap-4 items-center">
                   <span className="font-semibold text-gray-800">{item.name}</span>
 
                   <span className="text-sm text-gray-500">
@@ -252,7 +274,24 @@ export default function MyPage() {
                     >
                       {item.contact_status}
                     </span>
-                  </span>
+                    </span>
+
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                       onClick={() => {}}
+                        aria-label="수정"
+                        className="p-2 text-gray-400 hover:text-[#6A4F6A] transition-colors"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        aria-label="삭제"
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                 </div>
 
                 <p className="mt-3 text-sm text-gray-600 line-clamp-2">

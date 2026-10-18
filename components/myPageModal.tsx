@@ -14,10 +14,15 @@ interface ModalProps {
         subscribers?: string;
         avgViews?: string;
         intro?: string;
+        gender?: string;
+        contactPoint?: string;
+        contactNote?: string;
+        contactStatus?: string;
     };
+    editingId?: string; // 수정 모드인지 아닌지 구분
 }
 
-export default function Modal({ isOpen, onClose, onSaved, initialData }: ModalProps) {
+export default function Modal({ isOpen, onClose, onSaved, initialData, editingId }: ModalProps) {
     const [formData, setFormData] = useState({
         name: '',
         subscribers: '',
@@ -32,19 +37,18 @@ export default function Modal({ isOpen, onClose, onSaved, initialData }: ModalPr
     const user = useAuthStore((state)=> state.user);
     const [isSaving, setIsSaving] = useState(false);
 
-    // 추가: 모달이 열릴 때 initialData로 폼 채우기 (또는 빈 값으로 리셋)
     useEffect(() => {
         if (!isOpen) return;
-
+    
         setFormData({
             name: initialData?.name || '',
             subscribers: initialData?.subscribers || '',
             avgViews: initialData?.avgViews || '',
-            gender: 'M',
+            gender: initialData?.gender || 'M',
             intro: initialData?.intro || '',
-            contactPoint: '',
-            contactNote: '',
-            contactStatus: '미컨택',
+            contactPoint: initialData?.contactPoint || '',
+            contactNote: initialData?.contactNote || '',
+            contactStatus: initialData?.contactStatus || '미컨택',
         });
     }, [isOpen, initialData]);
 
@@ -66,31 +70,54 @@ export default function Modal({ isOpen, onClose, onSaved, initialData }: ModalPr
     if (!isOpen) return null;
 
     
-    const handleSave = async()=> {
-        if (!user) return;
-
+    const handleSave = async () => {
+        if (!user || isSaving) return;
+    
         if (!formData.name) {
             alert('이름은 필수 입력값입니다.');
             return;
         }
-
+    
         setIsSaving(true);
 
-        const {error} = await supabase.from('my_influencers').insert({
-            user_id: user.id,
-            name: formData.name,
-            gender: formData.gender,
-            subscribers: Number(formData.subscribers) || 0,
-            avg_views: Number(formData.avgViews) || 0,
-            description: formData.intro,
-            contact_point: formData.contactPoint,
-            contact_note: formData.contactNote,
-            contact_status: formData.contactStatus,
-            note: '',
-        });
-
+        let error;
+    
+        if (editingId) {
+            // 수정: 입력받은 값만 갱신, user_id/note/channel_id는 건드리지 않음
+            ({ error } = await supabase
+                .from('my_influencers')
+                .update({
+                    name: formData.name,
+                    subscribers: Number(formData.subscribers) || 0,
+                    avg_views: Number(formData.avgViews) || 0,
+                    gender: formData.gender,
+                    description: formData.intro,
+                    contact_point: formData.contactPoint,
+                    contact_note: formData.contactNote,
+                    contact_status: formData.contactStatus,
+                })
+                .eq('id', editingId)
+                .eq('user_id', user.id));
+        } else {
+            // 추가: 새 행이라 user_id와 note 기본값을 함께 넣음
+            ({ error } = await supabase
+                .from('my_influencers')
+                .insert({
+                    user_id: user.id,
+                    name: formData.name,
+                    subscribers: Number(formData.subscribers) || 0,
+                    avg_views: Number(formData.avgViews) || 0,
+                    gender: formData.gender,
+                    description: formData.intro,
+                    contact_point: formData.contactPoint,
+                    contact_note: formData.contactNote,
+                    contact_status: formData.contactStatus,
+                    note: '',
+                }));
+        }
+        
         setIsSaving(false);
-
+    
         if (error) {
             console.error('저장 오류:', error);
             alert('저장에 실패했습니다.');
@@ -100,6 +127,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData }: ModalPr
         onSaved(); // 부모(page.tsx)한테 인플루언서 목록 새로고침 시켜달라고 요청
         onClose();
     }
+
 
     return (
         <div
@@ -119,7 +147,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData }: ModalPr
             {/* 헤더 — 스크롤 밖, 고정 */}
                 <div className="flex items-center justify-between px-8 pt-8">
                     <p id="modal-title" className="text-[21px] font-medium text-black">
-                        항목 추가
+                        {editingId ? '항목 수정' : '항목 추가'}
                     </p>
 
                     <button

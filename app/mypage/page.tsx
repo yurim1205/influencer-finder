@@ -40,10 +40,10 @@ export default function MyPage() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [influencers, setInfluencers] = useState<MyInfluencer[]>([]);
-  const [dataLoading, setDataLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const sortButtonRef = useRef<HTMLButtonElement>(null);
+  const [editingItem, setEditingItem] = useState<MyInfluencer | null>(null); 
 
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -68,7 +68,6 @@ export default function MyPage() {
       } else {
         setInfluencers(data|| []);
       }
-      setDataLoading(false);
     };
 
     const handleDelete = async (id: string) => {
@@ -119,24 +118,34 @@ export default function MyPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isSortOpen]);
 
-  const filteredData = useMemo(()=> {
-    return influencers
-      .filter((item) => activeTab === '전체' || item.contact_status === activeTab)
-      .filter((item) => item.name.toLowerCase().includes(searchKeyword.toLowerCase()))
-      .sort((a, b) => {
-        if (sortType === 'subscribers') return b.subscribers - a.subscribers;
-        return b.avg_views - a.avg_views;
-      });
-    }, [influencers, activeTab, searchKeyword, sortType]);
+    const filteredData = useMemo(()=> {
+      return influencers
+        .filter((item) => activeTab === '전체' || item.contact_status === activeTab)
+        .filter((item) => item.name.toLowerCase().includes(searchKeyword.toLowerCase()))
+        .sort((a, b) => {
+          if (sortType === 'subscribers') return b.subscribers - a.subscribers;
+          return b.avg_views - a.avg_views;
+        });
+      }, [influencers, activeTab, searchKeyword, sortType]);
 
-  const formatCount = (num: number) => {
-    if (num >= 10000) return `${(num / 10000).toFixed(1)}만`;
-    return num.toLocaleString();
-  };
+    const handleEdit = (item: MyInfluencer) => {
+      setEditingItem(item);
+      setIsModalOpen(true);
+    };
+    
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+      setEditingItem(null);
+    };
 
-  if (loading || !user) {
-    return null;
-  }
+    const formatCount = (num: number) => {
+      if (num >= 10000) return `${(num / 10000).toFixed(1)}만`;
+      return num.toLocaleString();
+    };
+
+    if (loading || !user) {
+      return null;
+    }
 
   return (
     <div className="min-h-screen bg-page-gradient px-6 py-10">
@@ -227,7 +236,8 @@ export default function MyPage() {
           </div>
         ) : (
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="hidden md:grid grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr] gap-4 px-6 py-3 bg-gray-50 text-sm font-semibold text-gray-600 border-b border-gray-200">
+            <div className="hidden md:grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr_80px] gap-4 px-6 py-3 bg-gray-50
+              text-sm font-semibold text-gray-600 border-b border-gray-200">
               <span>이름</span>
               <span>성별</span>
               <span>구독자수</span>
@@ -278,15 +288,13 @@ export default function MyPage() {
 
                     <div className="flex items-center justify-end gap-1">
                       <button
-                       onClick={() => {}}
-                        aria-label="수정"
+                        onClick={() => handleEdit(item)} aria-label="수정"
                         className="p-2 text-gray-400 hover:text-[#6A4F6A] transition-colors"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(item.id)}
-                        aria-label="삭제"
+                        onClick={() => handleDelete(item.id)} aria-label="삭제"
                         className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -311,8 +319,19 @@ export default function MyPage() {
 
       <Modal 
           isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
+          onClose={handleCloseModal}
           onSaved={fetchInfluencers}
+          editingId={editingItem?.id}
+          initialData={editingItem ? { 
+            name: editingItem.name,
+            subscribers: String(editingItem.subscribers),
+            avgViews: String(editingItem.avg_views),
+            gender: editingItem.gender,
+            intro: editingItem.description,
+            contactPoint: editingItem.contact_point,
+            contactNote: editingItem.contact_note,
+            contactStatus: editingItem.contact_status,
+          } : undefined}
       />
     </div>
   );

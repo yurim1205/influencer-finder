@@ -68,17 +68,37 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
     }, [isOpen, onClose]);
 
     if (!isOpen) return null;
-
     
     const handleSave = async () => {
         if (!user || isSaving) return;
     
-        if (!formData.name) {
+        const name = formData.name.trim();
+
+        if (!name) {
             alert('이름은 필수 입력값입니다.');
             return;
         }
     
         setIsSaving(true);
+
+        // 같은 이름이 이미 있는지 확인 (수정일 때는 자기 자신 제외)
+        let duplicateQuery = supabase
+            .from('my_influencers')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('name', name);
+
+        if (editingId) {
+            duplicateQuery = duplicateQuery.neq('id', editingId);
+        }
+
+        const { data: duplicates } = await duplicateQuery.limit(1);
+
+        if (duplicates && duplicates.length > 0) {
+            setIsSaving(false);
+            alert('이미 같은 이름의 인플루언서가 있어요.');
+            return;
+        }
 
         let error;
     
@@ -87,7 +107,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
             ({ error } = await supabase
                 .from('my_influencers')
                 .update({
-                    name: formData.name,
+                    name,
                     subscribers: Number(formData.subscribers) || 0,
                     avg_views: Number(formData.avgViews) || 0,
                     gender: formData.gender,
@@ -104,7 +124,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                 .from('my_influencers')
                 .insert({
                     user_id: user.id,
-                    name: formData.name,
+                    name,
                     subscribers: Number(formData.subscribers) || 0,
                     avg_views: Number(formData.avgViews) || 0,
                     gender: formData.gender,
@@ -115,7 +135,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                     note: '',
                 }));
         }
-        
+
         setIsSaving(false);
     
         if (error) {

@@ -18,6 +18,7 @@ interface ModalProps {
         contactPoint?: string;
         contactNote?: string;
         contactStatus?: string;
+        note?: string;
     };
     editingId?: string; // 수정 모드인지 아닌지 구분
 }
@@ -32,6 +33,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
         contactPoint: '',
         contactNote: '',
         contactStatus: '미컨택',
+        note: '', 
     });
 
     const user = useAuthStore((state)=> state.user);
@@ -49,6 +51,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
             contactPoint: initialData?.contactPoint || '',
             contactNote: initialData?.contactNote || '',
             contactStatus: initialData?.contactStatus || '미컨택',
+            note: initialData?.note || '',
         });
     }, [isOpen, initialData]);
 
@@ -115,6 +118,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                     contact_point: formData.contactPoint,
                     contact_note: formData.contactNote,
                     contact_status: formData.contactStatus,
+                    note: formData.note,
                 })
                 .eq('id', editingId)
                 .eq('user_id', user.id));
@@ -132,7 +136,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                     contact_point: formData.contactPoint,
                     contact_note: formData.contactNote,
                     contact_status: formData.contactStatus,
-                    note: '',
+                    note: formData.note,
                 }));
         }
 
@@ -313,6 +317,20 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                             className="min-h-[100px] resize-y rounded-[20px] border border-[#c6c1c1] bg-[#f5f3f6] px-5 py-3 text-[16px]
                              text-black outline-none focus:border-[#4B5563] transition-all [field-sizing:content]"
                             placeholder='소개 및 대표 콘텐츠를 입력해주세요'
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="note" className={labelClass}>
+                            메모
+                        </label>
+                        <textarea
+                            id="note"
+                            value={formData.note}
+                            onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                            className="min-h-[80px] resize-y rounded-[20px] border border-[#c6c1c1] bg-[#f5f3f6] px-5 py-3 text-[16px]
+                            text-black outline-none focus:border-[#4B5563] transition-all [field-sizing:content]"
+                            placeholder="메모를 입력해주세요"
                         />
                     </div>
                 </div>

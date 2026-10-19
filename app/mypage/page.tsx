@@ -331,6 +331,7 @@ export default function MyPage() {
             contactPoint: editingItem.contact_point,
             contactNote: editingItem.contact_note,
             contactStatus: editingItem.contact_status,
+            note: editingItem.note,
           } : undefined}
       />
     </div>

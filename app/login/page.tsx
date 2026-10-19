@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useForm } from 'react-hook-form';
-import { email, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const loginSchema = z.object({
@@ -16,8 +16,16 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const rawRedirect = searchParams.get('redirect') || '/';
+    const redirectTo =
+    rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
+        ? rawRedirect
+        : '/';
+
     const [authError, setAuthError] = useState('');
 
     const {
@@ -42,7 +50,7 @@ export default function LoginPage() {
             return;
         }
 
-        router.push('/'); // 로그인 성공 후 이동할 페이지
+        router.push(redirectTo); // 로그인 성공 후 이동할 페이지
     };
     
     return (
@@ -114,3 +122,11 @@ export default function LoginPage() {
         </div>
     );
 }
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={null}>
+            <LoginForm />
+        </Suspense>
+    );
+}   

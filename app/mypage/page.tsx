@@ -51,7 +51,7 @@ export default function MyPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/login');
+      router.push(`/login?redirect=${encodeURIComponent('/mypage')}`);
     }
   }, [loading, user, router]);
 

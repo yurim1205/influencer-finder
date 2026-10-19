@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAuthStore } from "../stores/useAuthStore";
+import { useAuthStore } from "@/app/stores/useAuthStore";
 
 const loginSchema = z.object({
     email: z.string().email('올바른 이메일 주소를 입력해주세요'),
@@ -27,6 +27,7 @@ function LoginForm() {
         ? rawRedirect
         : '/';
 
+    // 이미 로그인한 사용자면 다른 페이지로 보내기
     const user = useAuthStore((state) => state.user);
     const loading = useAuthStore((state) => state.loading);
 
@@ -35,6 +36,7 @@ function LoginForm() {
             router.replace(redirectTo);
         }
     }, [loading, user, redirectTo, router]);
+
 
     const [authError, setAuthError] = useState('');
 

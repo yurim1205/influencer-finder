@@ -131,14 +131,16 @@ export default function SignupPage() {
               />
               <p className={`text-xs mt-1 ${
                 !passwordConfirm
-                ? 'text-gray-400' 
-                  : errors.passwordConfirm 
-                    ? 'text-red-400' 
+                  ? 'text-gray-400'
+                  : errors.passwordConfirm
+                    ? 'text-red-400'
                     : 'text-green-500'
               }`}>
-                {errors.passwordConfirm 
-                  ? errors.passwordConfirm.message 
-                  : '비밀번호를 한 번 더 입력해주세요'}
+                {!passwordConfirm
+                  ? '비밀번호를 한 번 더 입력해주세요'
+                  : errors.passwordConfirm
+                    ? errors.passwordConfirm.message
+                    : '비밀번호가 일치해요'}
               </p>
             </div>
           </div>
@@ -163,7 +165,7 @@ export default function SignupPage() {
           <p className="text-center text-sm text-gray-400 mt-4">
             이미 계정이 있으신가요?{' '}
             <Link href="/login" className="text-[#B39CB5] hover:underline">
-              로그인 하기
+              시작하기
             </Link>
           </p>
         </div>

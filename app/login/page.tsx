@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuthStore } from "@/app/stores/useAuthStore";
 
 const loginSchema = z.object({
     email: z.string().email('올바른 이메일 주소를 입력해주세요'),
@@ -25,6 +26,17 @@ function LoginForm() {
     rawRedirect.startsWith('/') && !rawRedirect.startsWith('//')
         ? rawRedirect
         : '/';
+
+    // 이미 로그인한 사용자면 다른 페이지로 보내기
+    const user = useAuthStore((state) => state.user);
+    const loading = useAuthStore((state) => state.loading);
+
+    useEffect(() => {
+        if (!loading && user) {
+            router.replace(redirectTo);
+        }
+    }, [loading, user, redirectTo, router]);
+
 
     const [authError, setAuthError] = useState('');
 

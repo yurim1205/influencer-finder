@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { X, User, LogOut } from 'lucide-react';
+import toast from "react-hot-toast";
 
 export default function Header() {
     const user = useAuthStore((state) => state.user);
@@ -14,10 +15,16 @@ export default function Header() {
     const menuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
 
-     {/* 로그아웃 메뉴 연결 */}
-    const handleLogout = async ()=> {
-        await supabase.auth.signOut();
+     {/* 로그아웃 메뉴 */}
+     const handleLogout = async () => {
+        const { error } = await supabase.auth.signOut();
         setIsMenuOpen(false);
+    
+        if (error) {
+            toast.error('로그아웃에 실패했습니다.');
+            return;
+        }
+        toast.success('로그아웃되었습니다');
     };
 
     {/* 마이페이지 메뉴 연결 */}

@@ -1,14 +1,15 @@
 'use client';
 
-import { convertToChannel, getChannelDetails, getChannelLatestVideos, YoutubeVideo , Channel } from "@/lib/youtube";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { convertToChannel, getChannelDetails, getChannelLatestVideos, YoutubeVideo, Channel } from "@/lib/youtube";
+import { ArrowLeft, Home, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { formatCount } from '@/lib/utils';
 import { useAuthStore } from "@/app/stores/useAuthStore";
-import {supabase} from '@/lib/supabase';
-import { Toaster, toast } from 'react-hot-toast';
-import Header from "@/components/Header";
+import { supabase } from '@/lib/supabase';
+import { toast } from 'react-hot-toast';
+import Header from '@/components/Header';
 
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
@@ -19,7 +20,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   const [loading, setLoading] = useState(true);
   const [latestVideos, setLatestVideos] = useState<YoutubeVideo[]>([]);
   const router = useRouter();
-  const [videoPage, setVideoPage] = useState(0);    
+  const [videoPage, setVideoPage] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const user = useAuthStore((state) => state.user);
@@ -42,7 +43,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
 
   useEffect(() => {
     if (!user || !channel) return;
-  
+
     const checkSaved = async () => {
       const { data } = await supabase
         .from('my_influencers')
@@ -50,10 +51,10 @@ export default function ChannelPage({ params }: ChannelPageProps) {
         .eq('user_id', user.id)
         .eq('channel_id', channel.id)
         .maybeSingle();
-  
+
       setIsSaved(!!data);
     };
-  
+
     checkSaved();
   }, [user, channel]);
 
@@ -84,18 +85,18 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   }
 
   const avgViews = latestVideos.length > 0
-  ? Math.round(latestVideos.slice(0, 5).reduce((sum, v) => sum + v.viewCount, 0) / Math.min(latestVideos.length, 5))
-  : 0;
+    ? Math.round(latestVideos.slice(0, 5).reduce((sum, v) => sum + v.viewCount, 0) / Math.min(latestVideos.length, 5))
+    : 0;
 
   const handleSave = async () => {
     if (!user) {
-      router.push('/login');
+      router.push(`/login?redirect=${encodeURIComponent(`/channel/${channel.id}`)}`);
       return;
     }
     if (isSaving) return;
-  
+
     setIsSaving(true);
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('my_influencers')
       .insert({
         user_id: user.id,
@@ -104,15 +105,14 @@ export default function ChannelPage({ params }: ChannelPageProps) {
         subscribers: channel.subscribers || 0,
         avg_views: avgViews || 0,
         description: channel.description || '',
-        gender: 'M',         
+        gender: 'M',
         contact_point: '',
         contact_note: '',
         contact_status: '미컨택',
         note: '',
-      })
-      .select();
+      });
     setIsSaving(false);
-  
+
     if (error) {
       if (error.code === '23505') {
         setIsSaved(true);
@@ -126,172 +126,158 @@ export default function ChannelPage({ params }: ChannelPageProps) {
     toast.success('마이페이지에 저장되었습니다');
   };
 
+  const totalVideoPages = Math.ceil(latestVideos.length / videosPerPage);
+
   return (
     <div className="min-h-screen bg-page-gradient px-6 py-10">
-       <Toaster position="top-center" />
-       <Header />
-        <div className="max-w-6xl mx-auto">
+      <Header />
+      <div className="max-w-4xl mx-auto">
+
+        {/* 뒤로가기 + 홈 */}
+        <div className="flex items-center gap-3 mb-4">
           <button
             onClick={() => router.back()}
-            className="text-purple-600 hover:text-purple-800 mb-6 inline-block font-semibold"
+            aria-label="뒤로가기"
+            className="text-gray-500 hover:text-gray-800 transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-purple-600" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
+          <Link href="/" aria-label="홈" className="text-gray-500 hover:text-gray-800 transition-colors">
+            <Home className="w-5 h-5" />
+          </Link>
+        </div>
 
-        {/* 모바일: 채널명 + 프로필 사진 */}
-          <div className="flex items-center gap-4 mb-8 lg:hidden">
-            {channel.thumbnail && (
+        {/* 위 카드: 채널명, 저장 버튼, 지표, 썸네일 */}
+        <div className="backdrop-blur-sm rounded-3xl border border-[#9FA2A8] p-6 sm:p-8
+          flex flex-col-reverse sm:flex-row sm:items-stretch justify-between gap-6">
+          <div className="flex flex-col justify-between gap-8 min-w-0">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-bold text-black">{channel.name}</h1>
+
+              <button
+                onClick={handleSave}
+                disabled={isSaving || isSaved}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all
+                  ${isSaved
+                    ? 'bg-white text-[#6A4F6A] border border-[#6A4F6A]/30 cursor-default'
+                    : 'bg-[#6A4F6A] text-white hover:shadow-md'}
+                  disabled:opacity-80`}
+              >
+                <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-[#6A4F6A]' : ''}`} />
+                {isSaving ? '저장 중...' : isSaved ? '저장됨' : '저장하기'}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <p className="text-base text-gray-600 mb-1">구독자</p>
+                <p className="text-4xl font-bold text-black">{formatCount(channel.subscribers || 0)}</p>
+              </div>
+              <div>
+                <p className="text-base text-gray-600 mb-1">평균 조회수</p>
+                <p className="text-4xl font-bold text-black">
+                  {latestVideos.length > 0 ? formatCount(avgViews || 0) : '-'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {channel.thumbnail && (
+            <a
+              href={`https://www.youtube.com/channel/${channel.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 self-center sm:self-auto"
+            >
               <img
                 src={channel.thumbnail}
                 alt={channel.name}
-                className="w-14 h-14 object-cover rounded-full flex-shrink-0"
+                className="w-28 h-28 sm:w-44 sm:h-44 object-cover rounded-2xl"
               />
-            )}
-            <h1 className="font-semibold text-black">{channel.name}</h1>
-          </div>
+            </a>
+          )}
+        </div>
 
-          <h1 className="hidden lg:block font-semibold text-black mb-8">
-            {channel.name}
-          </h1>
+        {/* 채널 설명 카드 */}
+        <div className="mt-6 backdrop-blur-sm rounded-3xl border border-[#9FA2A8] p-6 sm:p-8">
+          <h2 className="text-base text-gray-600 mb-3">채널 설명</h2>
+          <p className="text-black leading-relaxed text-lg font-medium whitespace-pre-line line-clamp-6">
+            {(channel.description || '채널 설명이 없습니다.').replace(/\n{2,}/g, '\n')}
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-            {/* 왼쪽 썸네일 - 모바일에서 숨김 */}
-            <div className="hidden lg:block bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200
-            cursor-pointer hover:scale-105 transition-all duration-300">
-              {channel.thumbnail ? (
+        {/* 최신 영상 카드 */}
+        <div className="mt-6 backdrop-blur-sm rounded-3xl border border-[#9FA2A8] p-6 sm:p-8">
+          <h2 className="text-base text-gray-600 mb-4">최신 영상</h2>
 
-                  <a href={`https://www.youtube.com/channel/${channel.id}`}
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   >
-                <img
-                  src={channel.thumbnail}
-                  alt={channel.name}
-                  className="w-full aspect-square object-cover rounded-2xl"
-                />
-                </a>
-              ) : (
-                <div className="bg-gray-100 aspect-square flex items-center justify-center rounded-2xl
-                ">
-                  <div className="text-center">
-                    <div className="text-9xl mb-4">🎥</div>
-                    <p className="text-gray-500 text-lg font-medium">채널 썸네일</p>
-                  </div>
-                </div>
-              )}
-            </div>
-        
-        {/* 오른쪽 영역 */}
-        <div className="flex flex-col gap-6">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
-              <h2 className="text-base text-gray-700 mb-4">채널 설명</h2>
-                <p className="text-black leading-relaxed text-lg font-medium whitespace-pre-line line-clamp-6">
-                  {(channel.description || '채널 설명이 없습니다.').replace(/\n{2,}/g, '\n')}
-                </p>
-            </div>
-
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-gray-200">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <p className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">구독자</p>
-                  <p className="text-2xl font-bold text-black">
-                    {formatCount(channel.subscribers || 0)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">조회수 (최근 5개 영상)</p>
-                  <p className="text-2xl font-bold text-black">
-                    {latestVideos.length > 0 ? formatCount(avgViews || 0) : '이 채널은 영상 정보를 제공하지 않습니다'}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={handleSave}
-              disabled={isSaving || isSaved}
-              className={`w-full px-4 py-4 font-semibold rounded-2xl transition-all duration-300
-                flex items-center justify-center gap-2
-                ${isSaved
-                  ? 'bg-white/80 text-[#6A4F6A] border border-[#6A4F6A]/30 cursor-default'
-                  : 'bg-[#6A4F6A] text-white hover:-translate-y-1 hover:shadow-lg shadow-md shadow-gray-400/50'}
-                disabled:opacity-60`}
-            >
-              {isSaving ? '저장 중...' : isSaved ? '✓ 저장됨' : '+ 마이페이지에 저장'}
-            </button>
-            </div>
-          </div> 
-
-        <div className="mt-14">
-          <h2 className="text-xl font-bold text-black mb-6">
-            채널의 최신 영상
-          </h2>
-          
           {latestVideos.length === 0 ? (
-            <div className="text-center py-10 bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200">
+            <div className="text-center py-10">
               <p className="text-gray-500 font-bold text-xl">이 채널은 영상 정보를 제공하지 않습니다</p>
             </div>
           ) : (
-          <div className="relative">
-          <button
-            onClick={() => {
-              setVideoPage((prev) => Math.max(prev - 1, 0));
-            }}
-            disabled={videoPage === 0}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all 
-            duration-300 text-purple-400 hover:text-purple-600"
-          >
-            <ChevronLeft className="w-8 h-8" />
-          </button>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {latestVideos.slice(videoPage * videosPerPage, videoPage * videosPerPage + videosPerPage).map((video) => (
-                <a
-                  key={video.id.videoId}
-                  href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-[1.01]"
-                >
-                  <img src={video.snippet.thumbnails.medium.url} alt={video.snippet.title} className="w-full h-40 object-cover rounded-xl mb-3" />
-                  <p className="font-semibold text-gray-800 line-clamp-2">{video.snippet.title}</p>
-                  <p className="text-sm text-gray-500 mt-1">{video.snippet.publishedAt.slice(0, 10)}</p>
-                </a>
-              ))}
-            </div>
-            
-             {/* 모바일: 아래 버튼 / 데스크탑: 양옆 버튼 */}
-            <div className="flex justify-center gap-4 mt-4 lg:hidden">
+            <div className="relative lg:px-12">
+              {/* 데스크탑: 왼쪽 화살표 */}
               <button
                 onClick={() => setVideoPage((prev) => Math.max(prev - 1, 0))}
                 disabled={videoPage === 0}
-                className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+                className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 disabled:opacity-30 z-10 
+                cursor-pointer hover:scale-105 transition-all duration-300 text-purple-400 hover:text-purple-600"
               >
                 <ChevronLeft className="w-8 h-8" />
               </button>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {latestVideos
+                  .slice(videoPage * videosPerPage, videoPage * videosPerPage + videosPerPage)
+                  .map((video) => (
+                    <a
+                      key={video.id.videoId}
+                      href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-[1.01]"
+                    >
+                      <img
+                        src={video.snippet.thumbnails.medium.url}
+                        alt={video.snippet.title}
+                        className="w-full h-40 object-cover rounded-xl mb-3"
+                      />
+                      <p className="font-semibold text-gray-800 line-clamp-2">{video.snippet.title}</p>
+                      <p className="text-sm text-gray-500 mt-1">{video.snippet.publishedAt.slice(0, 10)}</p>
+                    </a>
+                  ))}
+              </div>
+
+              {/* 모바일: 아래쪽 버튼 */}
+              <div className="flex justify-center gap-4 mt-4 lg:hidden">
+                <button
+                  onClick={() => setVideoPage((prev) => Math.max(prev - 1, 0))}
+                  disabled={videoPage === 0}
+                  className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </button>
+                <button
+                  onClick={() => setVideoPage((prev) => Math.min(prev + 1, totalVideoPages - 1))}
+                  disabled={videoPage === totalVideoPages - 1}
+                  className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </button>
+              </div>
+
+              {/* 데스크탑: 오른쪽 화살표 */}
               <button
-                onClick={() => setVideoPage((prev) => Math.min(prev + 1, Math.ceil(latestVideos.length / 3) - 1))}
-                disabled={videoPage === Math.ceil(latestVideos.length / 3) - 1}
-                className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+                onClick={() => setVideoPage((prev) => Math.min(prev + 1, totalVideoPages - 1))}
+                disabled={videoPage === totalVideoPages - 1}
+                className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all duration-300 text-purple-400 hover:text-purple-600"
               >
                 <ChevronRight className="w-8 h-8" />
               </button>
             </div>
-
-            <button
-              onClick={() => {
-                setVideoPage((prev) => Math.min(prev + 1, Math.ceil(latestVideos.length / 3) - 1));
-              }}
-              disabled={videoPage === Math.ceil(latestVideos.length / 3) - 1}
-              className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all 
-              duration-300 text-purple-400 hover:text-purple-600"
-            >
-              <ChevronRight className="w-8 h-8" />
-            </button>
-          </div>
-        )}
-        </div>
+          )}
         </div>
       </div>
+    </div>
   );
 }

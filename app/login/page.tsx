@@ -116,7 +116,7 @@ function LoginForm() {
             <button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full mt-20 py-4 bg-[#B39CB5] text-white font-medium rounded-full shadow-lg
+                    className="w-full mt-20 py-4 bg-[#6A4F6A] text-white font-medium rounded-full shadow-lg
                     hover:scale-110 transition-transform
                     duration-300 cursor-pointer"
                     >
@@ -126,7 +126,7 @@ function LoginForm() {
 
             <p className="text-center text-sm text-gray-400 mt-4">
                 계정이 없으신가요?{' '}
-                <Link href="/signup" className="text-[#B39CB5] hover:underline">
+                <Link href="/signup" className="text-[#6A4F6A] hover:underline">
                     회원가입 하기
                 </Link>
             </p>

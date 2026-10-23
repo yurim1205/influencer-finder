@@ -148,7 +148,7 @@ export default function SignupPage() {
           <button
             onClick={handleSubmit(handleSignup)}
             disabled={isSubmitting} // 회원가입 중복 요청 방지
-            className="w-full mt-8 py-4 bg-[#B39CB5] text-white font-medium rounded-full
+            className="w-full mt-8 py-4 bg-[#6A4F6A] text-white font-medium rounded-full
              hover:scale-110 transition-transform duration-300 cursor-pointer shadow-lg 
              disabled:opacity-50"
           >
@@ -164,7 +164,7 @@ export default function SignupPage() {
 
           <p className="text-center text-sm text-gray-400 mt-4">
             이미 계정이 있으신가요?{' '}
-            <Link href="/login" className="text-[#B39CB5] hover:underline">
+            <Link href="/login" className="text-[#6A4F6A] hover:underline">
               로그인
             </Link>
           </p>

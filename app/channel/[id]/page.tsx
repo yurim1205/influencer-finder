@@ -10,6 +10,7 @@ import { useAuthStore } from "@/app/stores/useAuthStore";
 import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 import Header from '@/components/Header';
+import ViewsChart from "@/components/ViewsChart";
 
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
@@ -147,10 +148,11 @@ export default function ChannelPage({ params }: ChannelPageProps) {
           </Link>
         </div>
 
-        {/* 위 카드: 채널명, 저장 버튼, 지표, 썸네일 */}
-        <div className="backdrop-blur-sm rounded-3xl border border-[#9FA2A8] p-6 sm:p-8
+        {/* 맨 위 카드 */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 
           flex flex-col-reverse sm:flex-row sm:items-stretch justify-between gap-6">
-          <div className="flex flex-col justify-between gap-8 min-w-0">
+
+          <div className="flex flex-col gap-8 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-bold text-black">{channel.name}</h1>
 
@@ -171,11 +173,11 @@ export default function ChannelPage({ params }: ChannelPageProps) {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <p className="text-base text-gray-600 mb-1">구독자</p>
-                <p className="text-4xl font-bold text-black">{formatCount(channel.subscribers || 0)}</p>
+                <p className="text-3xl font-bold text-black">{formatCount(channel.subscribers || 0)}</p>
               </div>
               <div>
                 <p className="text-base text-gray-600 mb-1">평균 조회수</p>
-                <p className="text-4xl font-bold text-black">
+                <p className="text-3xl font-bold text-black">
                   {latestVideos.length > 0 ? formatCount(avgViews || 0) : '-'}
                 </p>
               </div>
@@ -192,6 +194,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               <img
                 src={channel.thumbnail}
                 alt={channel.name}
+                referrerPolicy="no-referrer"
                 className="w-28 h-28 sm:w-44 sm:h-44 object-cover rounded-2xl"
               />
             </a>
@@ -199,15 +202,22 @@ export default function ChannelPage({ params }: ChannelPageProps) {
         </div>
 
         {/* 채널 설명 카드 */}
-        <div className="mt-6 backdrop-blur-sm rounded-3xl border border-[#9FA2A8] p-6 sm:p-8">
+        <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6">
           <h2 className="text-base text-gray-600 mb-3">채널 설명</h2>
-          <p className="text-black leading-relaxed text-lg font-medium whitespace-pre-line line-clamp-6">
+          <p className="text-black leading-relaxed text-base whitespace-pre-line line-clamp-4">
             {(channel.description || '채널 설명이 없습니다.').replace(/\n{2,}/g, '\n')}
           </p>
         </div>
 
+        {latestVideos.length > 0 && (
+          <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6">
+            <h2 className="text-base text-gray-600 mb-4">최근 영상 조회수</h2>
+            <ViewsChart videos={latestVideos} avgViews={avgViews} />
+          </div>
+        )}
+
         {/* 최신 영상 카드 */}
-        <div className="mt-6 backdrop-blur-sm rounded-3xl border border-[#9FA2A8] p-6 sm:p-8">
+        <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6">
           <h2 className="text-base text-gray-600 mb-4">최신 영상</h2>
 
           {latestVideos.length === 0 ? (
@@ -216,7 +226,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
             </div>
           ) : (
             <div className="relative lg:px-12">
-              {/* 데스크탑: 왼쪽 화살표 */}
+              {/* 왼쪽 화살표 */}
               <button
                 onClick={() => setVideoPage((prev) => Math.max(prev - 1, 0))}
                 disabled={videoPage === 0}
@@ -235,11 +245,12 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                       href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-[1.01]"
+                      className="rounded-2xl p-2 hover:bg-gray-50 transition-all"
                     >
                       <img
                         src={video.snippet.thumbnails.medium.url}
                         alt={video.snippet.title}
+                        referrerPolicy="no-referrer"
                         className="w-full h-40 object-cover rounded-xl mb-3"
                       />
                       <p className="font-semibold text-gray-800 line-clamp-2">{video.snippet.title}</p>
@@ -266,7 +277,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
                 </button>
               </div>
 
-              {/* 데스크탑: 오른쪽 화살표 */}
+              {/* 오른쪽 화살표 */}
               <button
                 onClick={() => setVideoPage((prev) => Math.min(prev + 1, totalVideoPages - 1))}
                 disabled={videoPage === totalVideoPages - 1}

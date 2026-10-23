@@ -86,7 +86,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   }
 
   const avgViews = latestVideos.length > 0
-    ? Math.round(latestVideos.slice(0, 5).reduce((sum, v) => sum + v.viewCount, 0) / Math.min(latestVideos.length, 5))
+    ? Math.round(latestVideos.reduce((sum, v) => sum + v.viewCount, 0) / latestVideos.length)
     : 0;
 
   const handleSave = async () => {

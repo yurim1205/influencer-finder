@@ -2,17 +2,29 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff, Check, X  } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import {useForm} from 'react-hook-form';
+import {useForm, useWatch} from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useWatch } from 'react-hook-form';
+import { useState } from 'react';
+
+const PASSWORD_RULES = [
+  { label: '영문 소문자', test: (v: string) => /[a-z]/.test(v) },
+  { label: '숫자', test: (v: string) => /\d/.test(v) },
+  { label: '특수문자', test: (v: string) => /[^A-Za-z0-9]/.test(v) },
+  { label: '6자 이상', test: (v: string) => v.length >= 6 },
+];
 
 const signupSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요.'),
   email: z.string().email('올바른 이메일 주소를 입력해주세요.'),
-  password: z.string().min(6, '비밀번호는 6자 이상 입력해주세요.'),
+ 
+  password: z
+    .string()
+    .refine((v) => PASSWORD_RULES.every((rule) => rule.test(v)), {
+      message: '비밀번호 조건을 모두 충족해주세요.',
+    }),
   passwordConfirm: z.string().min(1, '비밀번호를 확인해주세요'),
 }).refine((data) => data.password === data.passwordConfirm, {
   message: '비밀번호가 일치하지 않습니다.',
@@ -21,6 +33,23 @@ const signupSchema = z.object({
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
+// status: 'idle'(입력 전, 회색) | 'pass'(통과, 초록) | 'fail'(미통과, 빨강)
+function RuleChip({ label, status }: { label: string; status: 'idle' | 'pass' | 'fail' }) {
+  const style = {
+    idle: 'bg-gray-100 text-gray-500',
+    pass: 'bg-green-50 text-green-700',
+    fail: 'bg-red-50 text-red-500',
+  }[status];
+ 
+  return (
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${style}`}>
+      {status === 'pass' && <Check className="w-3.5 h-3.5" />}
+      {status === 'fail' && <X className="w-3.5 h-3.5" />}
+      {label}
+    </span>
+  );
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const { register, handleSubmit, formState: { errors, isSubmitting }, control } = useForm<SignupFormData>({
@@ -28,9 +57,16 @@ export default function SignupPage() {
     mode: 'onChange',
   });
 
-  const password = useWatch({ control, name: 'password' });
-  const passwordConfirm = useWatch({ control, name: 'passwordConfirm' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+
+  const password = useWatch({ control, name: 'password' }) ?? '';
+  const passwordConfirm = useWatch({ control, name: 'passwordConfirm' }) ?? '';
   const email = useWatch({ control, name: 'email' });
+
+  // 규칙 하나라도 못 지키면 빨간 상태
+  const isPasswordInvalid = password.length > 0 && !PASSWORD_RULES.every((rule) => rule.test(password));
+  const isConfirmMismatch = passwordConfirm.length > 0 && password !== passwordConfirm;
 
   const handleSignup = async (data: SignupFormData) => {
 
@@ -51,6 +87,9 @@ export default function SignupPage() {
     router.push('/signup/complete');
   };
 
+  const inputBase =
+    'w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-colors';
+
   return (
     <div className="min-h-screen bg-page-gradient flex">
       
@@ -58,7 +97,7 @@ export default function SignupPage() {
       <div className="flex flex-col justify-between p-10 w-1/2">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors w-fit"
+          className="flex items-center gap-2 text-black transition-colors w-fit"
         >
           <ChevronLeft className="w-8 h-8 text-gray-400"/>
         </button>
@@ -82,7 +121,8 @@ export default function SignupPage() {
               <input
                 type="text"
                 {...register('name')}
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-200"
+                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 
+                focus:ring-purple-200"
               />
             </div>
 
@@ -105,43 +145,76 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label className="text-sm text-gray-800 mb-2 block">비밀번호</label>
-              <input
-                type="password"
-                {...register('password')}
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-200"
-              />
-             <p className={`text-xs mt-1 ${
-                !password 
-                  ? 'text-gray-400' 
-                  : errors.password 
-                    ? 'text-red-400' 
-                    : 'text-green-500'
-              }`}>
-                6자 이상 입력해주세요
-              </p>
+              <label className={`text-sm mb-2 block ${isPasswordInvalid ? 'text-red-500' : 'text-gray-800'}`}>
+                비밀번호
+              </label>
+
+              <div className="relative">
+               <input
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password')}
+                  className={`${inputBase} pr-12 ${
+                    isPasswordInvalid
+                      ? 'border-red-300 focus:ring-red-100'
+                      : 'border-gray-200 focus:ring-purple-200'
+                  }`}
+                />
+                 <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                   {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                </button>
+              </div>
+
+               {/* aria-live: 칩 상태가 바뀌면 스크린 리더가 알려줌 */}
+               <div className="flex flex-wrap gap-1.5 mt-2" aria-live="polite">
+                {PASSWORD_RULES.map((rule) => (
+                  <RuleChip
+                    key={rule.label}
+                    label={rule.label}
+                    status={!password ? 'idle' : rule.test(password) ? 'pass' : 'fail'}
+                  />
+                ))}
+              </div>
             </div>
 
             <div>
-              <label className="text-sm text-gray-800 mb-2 block">비밀번호 확인</label>
-              <input
-                type="password"
-                {...register('passwordConfirm')}
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-200"
-              />
-              <p className={`text-xs mt-1 ${
-                !passwordConfirm
-                  ? 'text-gray-400'
-                  : errors.passwordConfirm
-                    ? 'text-red-400'
-                    : 'text-green-500'
-              }`}>
-                {!passwordConfirm
-                  ? '비밀번호를 한 번 더 입력해주세요'
-                  : errors.passwordConfirm
-                    ? errors.passwordConfirm.message
-                    : '비밀번호가 일치해요'}
-              </p>
+              <label className={`text-sm mb-2 block ${isConfirmMismatch ? 'text-red-500' : 'text-gray-800'}`}>
+                비밀번호 확인
+              </label>
+              <div className="relative">
+                <input
+                  type={showPasswordConfirm ? 'text' : 'password'}
+                  {...register('passwordConfirm')}
+                  className={`${inputBase} pr-12 ${
+                    isConfirmMismatch
+                      ? 'border-red-300 focus:ring-red-100'
+                      : 'border-gray-200 focus:ring-purple-200'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordConfirm((prev) => !prev)}
+                  aria-label={showPasswordConfirm ? '비밀번호 숨기기' : '비밀번호 보기'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPasswordConfirm ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                </button>
+              </div>
+ 
+              <div className="mt-2" aria-live="polite">
+                {passwordConfirm ? (
+                  <RuleChip
+                    label={isConfirmMismatch ? '비밀번호 불일치' : '비밀번호 일치'}
+                    status={isConfirmMismatch ? 'fail' : 'pass'}
+                  />
+                ) : (
+                  <p className="text-xs text-gray-400">비밀번호를 한 번 더 입력해주세요</p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -149,15 +222,16 @@ export default function SignupPage() {
             onClick={handleSubmit(handleSignup)}
             disabled={isSubmitting} // 회원가입 중복 요청 방지
             className="w-full mt-8 py-4 bg-[#6A4F6A] text-white font-medium rounded-full
-             hover:scale-110 transition-transform duration-300 cursor-pointer shadow-lg 
-             disabled:opacity-50"
+              flex items-center justify-center gap-2
+              hover:scale-105 transition-transform duration-300 cursor-pointer shadow-lg
+              disabled:opacity-50 disabled:hover:scale-100"
           >
-            {isSubmitting?(
+            {isSubmitting ? (
               <>
-              <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              <span>가입 중...</span>
+                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                <span>가입 중...</span>
               </>
-            ):(
+            ) : (
               '회원가입'
             )}
           </button>

@@ -236,7 +236,7 @@ export default function MyPage() {
           </div>
         ) : (
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="hidden md:grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr_80px] gap-4 px-6 py-3 bg-gray-50
+            <div className="hidden md:grid md:grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr_80px] gap-4 px-6 py-3 bg-gray-50
               text-sm font-semibold text-gray-600 border-b border-gray-200">
               <span>이름</span>
               <span>성별</span>

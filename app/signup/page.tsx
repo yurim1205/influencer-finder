@@ -206,13 +206,11 @@ export default function SignupPage() {
               </div>
  
               <div className="mt-2" aria-live="polite">
-                {passwordConfirm ? (
+                {passwordConfirm && (
                   <RuleChip
                     label={isConfirmMismatch ? '비밀번호 불일치' : '비밀번호 일치'}
                     status={isConfirmMismatch ? 'fail' : 'pass'}
                   />
-                ) : (
-                  <p className="text-xs text-gray-400">비밀번호를 한 번 더 입력해주세요</p>
                 )}
               </div>
             </div>

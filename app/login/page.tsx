@@ -88,7 +88,7 @@ function LoginForm() {
                     <input
                         type="email"
                         {...register('email')}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200"
+                        className="w-full text-black px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200"
                     />
                      {errors.email && (
                         <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
@@ -100,7 +100,7 @@ function LoginForm() {
                     <input
                         type="password"
                         {...register('password')}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200"
+                        className="w-full text-black px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200"
                     />
                     {errors.password && (
                         <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>

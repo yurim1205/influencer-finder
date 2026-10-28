@@ -88,7 +88,7 @@ export default function SignupPage() {
   };
 
   const inputBase =
-  'w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-colors';
+  'w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-colors text-black';
 
   return (
     <div className="min-h-screen bg-page-gradient relative flex items-center justify-center p-6 sm:p-10">
@@ -113,7 +113,7 @@ export default function SignupPage() {
                 type="text"
                 {...register('name')}
                 className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 
-                focus:ring-purple-200"
+                focus:ring-purple-200 text-black"
               />
             </div>
 
@@ -122,7 +122,7 @@ export default function SignupPage() {
               <input
                 type="email"
                 {...register('email')}
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-200"
+                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-200 text-black"
               />
               <p className={`text-xs mt-1 ${
               !email 
@@ -160,7 +160,6 @@ export default function SignupPage() {
                 </button>
               </div>
 
-               {/* aria-live: 칩 상태가 바뀌면 스크린 리더가 알려줌 */}
                <div className="flex flex-wrap gap-1.5 mt-2" aria-live="polite">
                 {PASSWORD_RULES.map((rule) => (
                   <RuleChip

@@ -39,7 +39,7 @@ function RuleChip({ label, status }: { label: string; status: 'idle' | 'pass' | 
     idle: 'bg-gray-100 text-gray-500',
     pass: 'bg-green-50 text-green-700',
     fail: 'bg-red-50 text-red-500',
-  }[status];
+  }[status]; // 상태값으로 꺼내쓰기
  
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${style}`}>
@@ -88,27 +88,18 @@ export default function SignupPage() {
   };
 
   const inputBase =
-    'w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-colors';
+  'w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-colors';
 
   return (
-    <div className="min-h-screen bg-page-gradient flex">
-      
-      {/* 왼쪽 영역 */}
-      <div className="flex flex-col justify-between p-10 w-1/2">
+    <div className="min-h-screen bg-page-gradient relative flex items-center justify-center p-6 sm:p-10">
         <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-black transition-colors w-fit"
-        >
-          <ChevronLeft className="w-8 h-8 text-gray-400"/>
+            onClick={() => router.back()}
+            aria-label="뒤로가기"
+            className="absolute top-6 left-6 sm:top-10 sm:left-10 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+          <ChevronLeft className="w-8 h-8" />
         </button>
 
-        {/* <p className="text-2xl font-bold text-gray-800">
-          서비스 관련 문구
-        </p> */}
-      </div>
-
-      {/* 오른쪽 폼 영역 */}
-      <div className="flex items-center justify-center w-1/2 p-10">
         <div className="bg-white/80 backdrop-blur-md rounded-3xl p-12 w-full max-w-lg shadow-sm border border-white/50">
           
           <h1 className="text-3xl font-bold text-gray-800 mb-8 font-['Carlito']">
@@ -242,6 +233,5 @@ export default function SignupPage() {
           </p>
         </div>
       </div>
-    </div>
   );
 }

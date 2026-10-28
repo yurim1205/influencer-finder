@@ -37,7 +37,6 @@ function LoginForm() {
         }
     }, [loading, user, redirectTo, router]);
 
-
     const [authError, setAuthError] = useState('');
 
     const {

@@ -74,7 +74,7 @@ function LoginForm() {
             <ChevronLeft className="w-8 h-8 text-gray-400"/>
         </button>
 
-        <div className="bg-white/30 backdrop-blur-md rounded-3xl p-12 w-full h-[600px] max-w-lg shadow-sm border border-white/50">
+        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-12 w-full h-[600px] max-w-lg shadow-sm border border-white/50">
                 <h1 className="text-3xl font-bold text-gray-800 mb-8 font-['Carlito']">
                     Log in
                 </h1>

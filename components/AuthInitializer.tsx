@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/app/stores/useAuthStore';
 
 export function AuthInitializer() {
+  // setUser, setLoading을 통해 값을 넣음
   const setUser = useAuthStore((state) => state.setUser);
   const setLoading = useAuthStore((state) => state.setLoading);
 

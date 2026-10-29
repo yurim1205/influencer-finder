@@ -2,7 +2,7 @@
 
 import { convertToChannel, getChannelDetails, getChannelLatestVideos, YoutubeVideo, Channel } from "@/lib/youtube";
 import { ArrowLeft, Home, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatCount } from '@/lib/utils';
@@ -21,11 +21,19 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   const [loading, setLoading] = useState(true);
   const [latestVideos, setLatestVideos] = useState<YoutubeVideo[]>([]);
   const router = useRouter();
-  const [videoPage, setVideoPage] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  
   const user = useAuthStore((state) => state.user);
-  const videosPerPage = 3;
+
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const scrollVideos = (direction: 1 | -1) => {
+    trackRef.current?.scrollBy({
+      left: direction * (trackRef.current?.clientWidth ?? 0),
+      behavior: 'smooth',
+    });
+  };
 
   useEffect(() => {
     async function fetchChannel() {
@@ -127,12 +135,10 @@ export default function ChannelPage({ params }: ChannelPageProps) {
     toast.success('마이페이지에 저장되었습니다');
   };
 
-  const totalVideoPages = Math.ceil(latestVideos.length / videosPerPage);
-
   return (
     <div className="min-h-screen bg-page-gradient px-6 py-10">
       <Header />
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
 
         {/* 뒤로가기 + 홈 */}
         <div className="flex items-center gap-3 mb-4">
@@ -149,11 +155,28 @@ export default function ChannelPage({ params }: ChannelPageProps) {
         </div>
 
         {/* 맨 위 카드 */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 
-          flex flex-col-reverse sm:flex-row sm:items-stretch justify-between gap-6">
-
+        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 grid grid-cols-1
+         lg:grid-cols-2 gap-8">
+          
           <div className="flex flex-col gap-8 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
+              {channel.thumbnail && (
+                  <a
+                    href={`https://www.youtube.com/channel/${channel.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${channel.name} 유튜브 채널로 이동`}
+                    className="shrink-0"
+                  >
+                    <img
+                      src={channel.thumbnail}
+                      alt={channel.name}
+                      referrerPolicy="no-referrer"
+                      className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-full border border-gray-200"
+                    />
+                  </a>
+                )}
+
               <h1 className="text-2xl sm:text-3xl font-bold text-black">{channel.name}</h1>
 
               <button
@@ -170,51 +193,41 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <p className="text-base text-gray-600 mb-1">구독자</p>
-                <p className="text-3xl font-bold text-black">{formatCount(channel.subscribers || 0)}</p>
-              </div>
-              <div>
-                <p className="text-base text-gray-600 mb-1">평균 조회수</p>
-                <p className="text-3xl font-bold text-black">
-                  {latestVideos.length > 0 ? formatCount(avgViews || 0) : '-'}
-                </p>
-              </div>
+             <div className="grid grid-cols-2 gap-6 max-w-md">
+                <div>
+                  <p className="text-base text-gray-600 mb-1">구독자</p>
+                  <p className="text-3xl font-bold text-black">{formatCount(channel.subscribers || 0)}</p>
+                </div>
+
+                <div>
+                  <p className="text-base text-gray-600 mb-1">평균 조회수</p>
+                  <p className="text-3xl font-bold text-black">
+                    {latestVideos.length > 0 ? formatCount(avgViews || 0) : '-'}
+                  </p>
+                </div>
+            </div>
+
+           {/* 채널 설명 */}          
+            <div>
+              <h2 className="text-base text-gray-600 mb-2">채널 설명</h2>
+              <p className="text-black leading-relaxed text-base whitespace-pre-line line-clamp-4">
+                {(channel.description || '채널 설명이 없습니다.').replace(/\n{2,}/g, '\n')}
+              </p>
             </div>
           </div>
 
-          {channel.thumbnail && (
-            <a
-              href={`https://www.youtube.com/channel/${channel.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 self-center sm:self-auto"
-            >
-              <img
-                src={channel.thumbnail}
-                alt={channel.name}
-                referrerPolicy="no-referrer"
-                className="w-28 h-28 sm:w-44 sm:h-44 object-cover rounded-2xl"
-              />
-            </a>
-          )}
-        </div>
-
-        {/* 채널 설명 카드 */}
-        <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6">
-          <h2 className="text-base text-gray-600 mb-3">채널 설명</h2>
-          <p className="text-black leading-relaxed text-base whitespace-pre-line line-clamp-4">
-            {(channel.description || '채널 설명이 없습니다.').replace(/\n{2,}/g, '\n')}
-          </p>
-        </div>
-
-        {latestVideos.length > 0 && (
-          <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6">
+          <div className="min-w-0">
             <h2 className="text-base text-gray-600 mb-4">최근 영상 조회수</h2>
-            <ViewsChart videos={latestVideos} avgViews={avgViews} />
-          </div>
-        )}
+              {latestVideos.length > 0 ? (
+              <ViewsChart videos={latestVideos} avgViews={avgViews} />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center rounded-xl bg-gray-50">
+                <p className="text-gray-400">표시할 영상 데이터가 없습니다</p>
+              </div>
+            )}
+         </div>
+        </div>
+
 
         {/* 최신 영상 카드 */}
         <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6">
@@ -228,50 +241,48 @@ export default function ChannelPage({ params }: ChannelPageProps) {
             <div className="relative lg:px-12">
               {/* 왼쪽 화살표 */}
               <button
-                onClick={() => setVideoPage((prev) => Math.max(prev - 1, 0))}
-                disabled={videoPage === 0}
-                className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 disabled:opacity-30 z-10 
+                onClick={()=> scrollVideos(-1)}
+                className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 z-10 
                 cursor-pointer hover:scale-105 transition-all duration-300 text-purple-400 hover:text-purple-600"
               >
                 <ChevronLeft className="w-8 h-8" />
               </button>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {latestVideos
-                  .slice(videoPage * videosPerPage, videoPage * videosPerPage + videosPerPage)
-                  .map((video) => (
-                    <a
-                      key={video.id.videoId}
-                      href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-2xl p-2 hover:bg-gray-50 transition-all"
-                    >
-                      <img
-                        src={video.snippet.thumbnails.medium.url}
-                        alt={video.snippet.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-40 object-cover rounded-xl mb-3"
-                      />
-                      <p className="font-semibold text-gray-800 line-clamp-2">{video.snippet.title}</p>
-                      <p className="text-sm text-gray-500 mt-1">{video.snippet.publishedAt.slice(0, 10)}</p>
-                    </a>
-                  ))}
+              <div
+                ref={trackRef}
+                className="flex gap-4 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {latestVideos.map((video) => (
+                  <a
+                    key={video.id.videoId}
+                    href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="snap-start shrink-0 w-full sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)] rounded-2xl p-2 hover:bg-gray-50 transition-colors"
+                  >
+                    <img
+                      src={video.snippet.thumbnails.medium.url}
+                      alt={video.snippet.title}
+                      referrerPolicy="no-referrer"
+                      className="w-full object-cover rounded-xl mb-3 aspect-video"
+                    />
+                    <p className="font-semibold text-gray-800 line-clamp-2">{video.snippet.title}</p>
+                    <p className="text-sm text-gray-500 mt-1">{video.snippet.publishedAt.slice(0, 10)}</p>
+                  </a>
+                ))}
               </div>
 
               {/* 모바일: 아래쪽 버튼 */}
               <div className="flex justify-center gap-4 mt-4 lg:hidden">
                 <button
-                  onClick={() => setVideoPage((prev) => Math.max(prev - 1, 0))}
-                  disabled={videoPage === 0}
-                  className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+                  onClick={()=> scrollVideos(-1)}
+                  className="p-2 text-purple-400 hover:text-purple-600 transition-all"
                 >
                   <ChevronLeft className="w-8 h-8" />
                 </button>
                 <button
-                  onClick={() => setVideoPage((prev) => Math.min(prev + 1, totalVideoPages - 1))}
-                  disabled={videoPage === totalVideoPages - 1}
-                  className="p-2 text-purple-400 hover:text-purple-600 disabled:opacity-30 transition-all"
+                  onClick={()=> scrollVideos(1)}
+                  className="p-2 text-purple-400 hover:text-purple-600 transition-all"
                 >
                   <ChevronRight className="w-8 h-8" />
                 </button>
@@ -279,9 +290,8 @@ export default function ChannelPage({ params }: ChannelPageProps) {
 
               {/* 오른쪽 화살표 */}
               <button
-                onClick={() => setVideoPage((prev) => Math.min(prev + 1, totalVideoPages - 1))}
-                disabled={videoPage === totalVideoPages - 1}
-                className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 disabled:opacity-30 z-10 cursor-pointer hover:scale-105 transition-all duration-300 text-purple-400 hover:text-purple-600"
+                onClick={()=> scrollVideos(1)}
+                className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 z-10 cursor-pointer hover:scale-105 transition-all duration-300 text-purple-400 hover:text-purple-600"
               >
                 <ChevronRight className="w-8 h-8" />
               </button>

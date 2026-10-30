@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Eye, EyeOff, Check, X  } from 'lucide-react';
+import { ChevronLeft, Check, X  } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import {useForm, useWatch} from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import Input from '@/components/Input';
 
 const PASSWORD_RULES = [
   { label: '영문 소문자', test: (v: string) => /[a-z]/.test(v) },
@@ -57,9 +57,6 @@ export default function SignupPage() {
     mode: 'onChange',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-
   const password = useWatch({ control, name: 'password' }) ?? '';
   const passwordConfirm = useWatch({ control, name: 'passwordConfirm' }) ?? '';
   const email = useWatch({ control, name: 'email' });
@@ -87,8 +84,6 @@ export default function SignupPage() {
     router.push('/signup/complete');
   };
 
-  const inputBase =
-  'w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 transition-colors text-black';
 
   return (
     <div className="min-h-screen bg-page-gradient relative flex items-center justify-center p-6 sm:p-10">
@@ -106,61 +101,19 @@ export default function SignupPage() {
             Sign UP
           </h1>
 
-          <div className="flex flex-col gap-5">
-            <div>
-              <label className="text-sm text-gray-800 mb-2 block">이름</label>
-              <input
-                type="text"
-                {...register('name')}
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 
-                focus:ring-purple-200 text-black"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm text-gray-800 mb-2 block">이메일</label>
-              <input
-                type="email"
-                {...register('email')}
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-200 text-black"
-              />
+          <div className="flex flex-col gap-5"> 
+            <Input label="이름" {...register('name')} />
+    
+            <Input label="이메일" type="email" invalid={!!email && !!errors.email} {...register('email')}>
               <p className={`text-xs mt-1 ${
-              !email 
-                ? 'text-gray-400' 
-                : errors.email 
-                  ? 'text-red-400' 
-                  : 'text-green-500'
-            }`}>
-              {errors.email ? errors.email.message : '올바른 이메일 형식을 입력해주세요'}
-            </p>
-            </div>
+                !email ? 'text-gray-400' : errors.email ? 'text-red-400' : 'text-green-500'
+              }`}>
+                {errors.email ? errors.email.message : '올바른 이메일 형식을 입력해주세요'}
+              </p>
+            </Input>
 
-            <div>
-              <label className={`text-sm mb-2 block ${isPasswordInvalid ? 'text-red-500' : 'text-gray-800'}`}>
-                비밀번호
-              </label>
-
-              <div className="relative">
-               <input
-                  type={showPassword ? 'text' : 'password'}
-                  {...register('password')}
-                  className={`${inputBase} pr-12 ${
-                    isPasswordInvalid
-                      ? 'border-red-300 focus:ring-red-100'
-                      : 'border-gray-200 focus:ring-purple-200'
-                  }`}
-                />
-                 <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                   {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-                </button>
-              </div>
-
-               <div className="flex flex-wrap gap-1.5 mt-2" aria-live="polite">
+            <Input label="비밀번호" type="password" invalid={isPasswordInvalid} {...register('password')}>
+              <div className="flex flex-wrap gap-1.5 mt-2" aria-live="polite">
                 {PASSWORD_RULES.map((rule) => (
                   <RuleChip
                     key={rule.label}
@@ -169,32 +122,9 @@ export default function SignupPage() {
                   />
                 ))}
               </div>
-            </div>
+            </Input>
 
-            <div>
-              <label className={`text-sm mb-2 block ${isConfirmMismatch ? 'text-red-500' : 'text-gray-800'}`}>
-                비밀번호 확인
-              </label>
-              <div className="relative">
-                <input
-                  type={showPasswordConfirm ? 'text' : 'password'}
-                  {...register('passwordConfirm')}
-                  className={`${inputBase} pr-12 ${
-                    isConfirmMismatch
-                      ? 'border-red-300 focus:ring-red-100'
-                      : 'border-gray-200 focus:ring-purple-200'
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPasswordConfirm((prev) => !prev)}
-                  aria-label={showPasswordConfirm ? '비밀번호 숨기기' : '비밀번호 보기'}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPasswordConfirm ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
-                </button>
-              </div>
- 
+            <Input label="비밀번호 확인" type="password" invalid={isConfirmMismatch} {...register('passwordConfirm')}>
               <div className="mt-2" aria-live="polite">
                 {passwordConfirm && (
                   <RuleChip
@@ -203,7 +133,7 @@ export default function SignupPage() {
                   />
                 )}
               </div>
-            </div>
+            </Input>
           </div>
 
           <button

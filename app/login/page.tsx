@@ -115,7 +115,7 @@ function LoginForm() {
             <button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full mt-20 py-4 bg-[#6A4F6A] text-white font-medium rounded-full shadow-lg
+                    className="w-full mt-20 py-4 bg-[#6A4F6A] text-white font-medium rounded-2xl shadow-lg
                     hover:scale-110 transition-transform
                     duration-300 cursor-pointer"
                     >

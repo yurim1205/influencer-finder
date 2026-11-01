@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 import Header from '@/components/Header';
 import ViewsChart from "@/components/ViewsChart";
+import Card from "@/components/Card";
 
 interface ChannelPageProps {
   params: Promise<{ id: string }>;
@@ -155,7 +156,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
         </div>
 
         {/* 맨 위 카드 */}
-        <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 grid grid-cols-1
+        <Card className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 grid grid-cols-1
          lg:grid-cols-2 gap-8">
           
           <div className="flex flex-col gap-8 min-w-0">
@@ -226,11 +227,11 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               </div>
             )}
          </div>
-        </div>
+        </Card>
 
 
         {/* 최신 영상 카드 */}
-        <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6">
+        <Card className="mt-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6">
           <h2 className="text-base text-gray-600 mb-4">최신 영상</h2>
 
           {latestVideos.length === 0 ? (
@@ -297,7 +298,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
               </button>
             </div>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from "@/app/stores/useAuthStore";
+import Input from "@/components/Input";
 
 const loginSchema = z.object({
     email: z.string().email('올바른 이메일 주소를 입력해주세요'),
@@ -83,29 +84,17 @@ function LoginForm() {
 
         <form onSubmit={handleSubmit(handleLogin)}>
             <div className="flex flex-col gap-6">
-                <div>
-                    <label className="text-sm text-gray-800 mt-6 mb-2 block">이메일</label>
-                    <input
-                        type="email"
-                        {...register('email')}
-                        className="w-full text-black px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200"
-                    />
-                     {errors.email && (
-                        <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
+                <Input label="이메일" type="email" invalid={!!errors.email} {...register('email')}>
+                    {errors.email && (
+                    <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
                     )}
-                </div>
+                </Input>
 
-                <div>
-                    <label className="text-sm text-gray-800 mb-2 block">비밀번호</label>
-                    <input
-                        type="password"
-                        {...register('password')}
-                        className="w-full text-black px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-200"
-                    />
+                <Input label="비밀번호" type="password" invalid={!!errors.password} {...register('password')}>
                     {errors.password && (
-                        <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>
+                    <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>
                     )}
-                </div>
+                </Input>
             </div>
 
             {authError && (

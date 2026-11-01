@@ -88,7 +88,12 @@ export default function ViewsChart({ videos, avgViews }: ViewsChartProps) {
           }}
         />
 
-        <Bar dataKey="views" fill="#B39CB5" radius={[6, 6, 0, 0]} activeBar={{ fill: '#6A4F6A' }} />
+        <Bar
+          dataKey="views"
+          fill="#DCCFDD"                     
+          radius={[6, 6, 0, 0]}
+          activeBar={{ fill: '#B39CB5' }}    
+        />
       </BarChart>
     </ResponsiveContainer>
   );

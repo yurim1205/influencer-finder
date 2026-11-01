@@ -4,9 +4,10 @@
 
 [서비스 링크](https://influencer-finder-eight.vercel.app/)
 
-[테스트 계정]
-이메일: finder123@naver.com  
-비밀번호: finder123\*\*
+### 테스트 계정
+
+- 이메일: test@example.com
+- 비밀번호: test123\*\*
 
 ## 🧩 주요 기능
 

@@ -10,6 +10,7 @@ import Modal from '@/components/myPageModal';
 import {createPortal} from 'react-dom';
 import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import Card from '@/components/Card';
 
 interface MyInfluencer {
   id: string;
@@ -231,11 +232,11 @@ export default function MyPage() {
         </div>
 
         {filteredData.length === 0 ? (
-          <div className="text-center py-20 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200">
+          <Card className="text-center py-20 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200">
             <p className="text-gray-500 text-lg">저장한 인플루언서가 없습니다</p>
-          </div>
+          </Card>
         ) : (
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 overflow-hidden">
+          <Card className="overflow-hidden">
             <div className="hidden md:grid md:grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr_80px] gap-4 px-6 py-3 bg-gray-50
               text-sm font-semibold text-gray-600 border-b border-gray-200">
               <span>이름</span>
@@ -313,7 +314,7 @@ export default function MyPage() {
                 </p>
               </div>
             ))}
-          </div>
+          </Card>
         )}
       </div>
 

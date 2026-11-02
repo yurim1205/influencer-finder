@@ -13,7 +13,8 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        // 토큰이 갱신되면 새 쿠키를 응답에 담아 브라우저로 돌려줌
+
+        // 리프레시 토큰이 발급됐을 때, 새 토큰을 쿠키에 다시 저장해서 로그인 상태를 유지
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });

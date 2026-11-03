@@ -89,6 +89,23 @@ export default function MyPage() {
       toast.success('삭제되었습니다');
       fetchInfluencers();
     };
+
+    // 회원 탈퇴 함수 
+    const handleDeleteAccount = async () => {
+      if (!window.confirm('정말 탈퇴하시겠어요?')) return;
+    
+      const res = await fetch('/api/account', { method: 'DELETE' });
+      const result = await res.json();
+    
+      if (!res.ok) {
+        toast.error(result.error ?? '탈퇴에 실패했습니다.');
+        return;
+      }
+    
+      await supabase.auth.signOut({ scope: 'local' });
+      toast.success('탈퇴가 완료되었어요.');
+      router.push('/');
+    };
     
     useEffect(()=> {
       if (user) {
@@ -173,7 +190,7 @@ export default function MyPage() {
                 {tab}
               </button>
             ))}
-          </div>
+          </div> 
 
           <div className="flex items-center gap-3">
             {/* 정렬 드롭다운 */}
@@ -316,6 +333,15 @@ export default function MyPage() {
             ))}
           </Card>
         )}
+      </div>
+
+      <div className="max-w-6xl mx-auto w-full mt-4 flex justify-end">
+        <button
+          onClick={handleDeleteAccount}
+          className="text-sm text-gray-400 hover:text-red-500 underline underline-offset-2 transition-colors"
+        >
+          회원탈퇴
+        </button>
       </div>
 
       <Modal 

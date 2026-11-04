@@ -52,7 +52,7 @@ function RuleChip({ label, status }: { label: string; status: 'idle' | 'pass' | 
 
 export default function SignupPage() {
   const router = useRouter();
-  const { register, handleSubmit, formState: { errors, isSubmitting }, control } = useForm<SignupFormData>({
+  const { register, handleSubmit, setError, formState: { errors, isSubmitting }, control } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     mode: 'onChange',
   });
@@ -77,6 +77,16 @@ export default function SignupPage() {
     });
   
     if (error) {
+      // 이미 가입된 이메일
+      if (error.code === 'user_already_exists' || error.message.includes('already registered')) {
+        setError('email', {
+          type: 'server',
+          message: '이미 가입된 이메일이에요. 로그인해 주세요.',
+        });
+        return;
+      }
+    
+      console.error('회원가입 오류:', error.message);
       alert('회원가입에 실패했습니다. 다시 시도해주세요.');
       return;
     }

@@ -192,13 +192,14 @@ export default function MyPage() {
             ))}
           </div> 
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             {/* 정렬 드롭다운 */}
             <div className="relative z-0">
               <button
                 ref={sortButtonRef}
                 onClick={() => setIsSortOpen(!isSortOpen)}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 flex items-center gap-2"
+                className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 
+                flex items-center gap-2 whitespace-nowrap"
               >
                 정렬: {SORT_OPTIONS.find((o) => o.value === sortType)?.label}
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
@@ -232,16 +233,17 @@ export default function MyPage() {
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               placeholder="이름으로 검색해주세요"
-              className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 
-              focus:ring-purple-200 w-56 text-gray-600"
+              className="flex-1 min-w-0 md:flex-none md:w-56 px-4 py-2 border border-gray-200 rounded-xl text-sm 
+              focus:outline-none focus:ring-2 focus:ring-purple-200 text-gray-600"
             />
             
-            {/******* 항목 추가 버튼 ********/}
+            {/** 항목 추가 버튼 **/}
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-[#6A4F6A] text-white text-sm font-medium rounded-xl
-            hover:-translate-y-1 hover:shadow-lg transition-all duration-300
-            flex items-center gap-1 shadow-md shadow-gray-400/50">
+              className="px-4 py-2 bg-[#6A4F6A] text-white text-sm font-medium rounded-xl whitespace-nowrap shrink-0
+              hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex items-center gap-1 shadow-md 
+              shadow-gray-400/50"
+            >
               + 항목 추가
             </button>
 
@@ -249,7 +251,7 @@ export default function MyPage() {
         </div>
 
         {filteredData.length === 0 ? (
-          <Card className="text-center py-20 bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200">
+          <Card className="text-center py-20">
             <p className="text-gray-500 text-lg">저장한 인플루언서가 없습니다</p>
           </Card>
         ) : (

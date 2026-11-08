@@ -56,8 +56,19 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
     }, [isOpen, initialData]);
 
      const inputClass =
-      'h-[42px] rounded-full border border-[#c6c1c1] bg-[#f5f3f6] px-5 text-[16px] text-black outline-none focus:border-[#4B5563] transition-all';
+      'h-[42px] rounded-2xl border border-[#c6c1c1] bg-[#f5f3f6] px-5 text-[16px] text-black outline-none focus:border-[#4B5563] transition-all';
      const labelClass = 'text-[16px] font-medium text-[#717070]';
+
+     useEffect(() => {
+        if (!isOpen) return;
+      
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+      
+        return () => {
+          document.body.style.overflow = prevOverflow;
+        };
+      }, [isOpen]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -155,7 +166,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
             onClick={onClose}
         >
             <div
@@ -185,7 +196,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                 </div>
 
                  {/* 본문 — 여기부터 스크롤 */}
-                <div className="flex flex-col gap-6 overflow-y-auto px-8 py-6">
+                <div className="flex flex-col gap-6 overflow-y-auto overscroll-contain px-8 py-6">
                      <div className="flex flex-col gap-2">
                         <label htmlFor="name" className={labelClass}>
                             이름 <span className="text-[#ff5f5f]">*</span>
@@ -335,12 +346,12 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                     </div>
                 </div>
 
-                <div className="mt-8 flex justify-center gap-4 mb-4">
+                <div className="flex gap-3 border-t border-gray-100 px-8 py-5 justify-center">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex h-[53px] w-[118px] items-center justify-center rounded-full bg-[#e8dcea] text-[21px] 
-                        font-medium text-[#717070] hover:cursor-pointer shadow-[0px_4px_10px_0px_#eaeaea]"
+                        className="h-12 flex-1 sm:flex-none sm:w-28 rounded-full bg-[#f1eaf2] text-base font-medium text-[#6A4F6A]
+                        hover:bg-[#e8dcea] transition-colors cursor-pointer"
                     >
                         취소
                     </button>
@@ -348,8 +359,8 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                         type="button"
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="flex h-[53px] w-[118px] items-center justify-center rounded-full bg-[#6a4f6a] text-[21px] 
-                        font-medium text-white hover:cursor-pointer shadow-[0px_4px_10px_0px_#eaeaea]"
+                        className="h-12 flex-1 sm:flex-none sm:w-28 rounded-full bg-[#6a4f6a] text-base font-medium text-white
+                        hover:bg-[#5a425a] transition-colors cursor-pointer disabled:opacity-60"
                     >
                         {isSaving ? '저장 중...' : '저장'}
                     </button>

@@ -137,7 +137,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-page-gradient px-6 py-10 flex flex-col">
+    <div className="min-h-screen bg-page-gradient px-6 py-10">
       <Header />
       <div className="max-w-6xl mx-auto">
 

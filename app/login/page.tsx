@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from "@/app/stores/useAuthStore";
 import Input from "@/components/Input";
+import toast from "react-hot-toast";
 
 const loginSchema = z.object({
     email: z.string().email('올바른 이메일 주소를 입력해주세요'),
@@ -58,9 +59,14 @@ function LoginForm() {
         });
 
         if (error) {
-            setAuthError('이메일 또는 비밀번호가 올바르지 않습니다.');
+            if (error.code === 'invalid_credentials') {
+              setAuthError('이메일 또는 비밀번호가 올바르지 않습니다.');
+              return;
+            }
+          
+            toast.error('로그인 중 문제가 발생했어요. 잠시 후 다시 시도해주세요.');
             return;
-        }
+          }
 
         router.push(redirectTo); // 로그인 성공 후 이동할 페이지
     };
@@ -84,22 +90,29 @@ function LoginForm() {
 
         <form onSubmit={handleSubmit(handleLogin)}>
             <div className="flex flex-col gap-6">
-                <Input label="이메일" type="email" invalid={!!errors.email} {...register('email')}>
+                <Input 
+                    label="이메일" 
+                    type="email" 
+                    invalid={!!errors.email} {...register('email')}>
                     {errors.email && (
                     <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>
                     )}
                 </Input>
 
-                <Input label="비밀번호" type="password" invalid={!!errors.password} {...register('password')}>
+                <Input 
+                    label="비밀번호" 
+                    type="password" 
+                    invalid={!!errors.password || !!authError}
+                    {...register('password', { onChange: () => setAuthError('') })}
+                >
                     {errors.password && (
-                    <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>
+                      <p className="text-red-400 text-xs mt-1">{errors.password.message}</p>
+                    )}
+                    {authError && (
+                      <p className="text-red-500 text-sm mt-1">{authError}</p>
                     )}
                 </Input>
             </div>
-
-            {authError && (
-            <p className="text-red-400 text-sm text-center mt-4">{authError}</p>
-          )}
 
             <button 
                     type="submit"

@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase';
 import Modal from '@/components/myPageModal';
 import {createPortal} from 'react-dom';
 import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import Card from '@/components/Card';
 
 interface MyInfluencer {
@@ -168,7 +168,6 @@ export default function MyPage() {
   return (
     <div className="min-h-screen bg-page-gradient px-6 py-10">
       <Header />
-      <Toaster position="top-center" />
       <div className="max-w-6xl mx-auto">
       <Link href="/" className="text-xl font-bold text-gray-500">
           Influencer Finder

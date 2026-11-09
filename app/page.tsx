@@ -2,7 +2,7 @@
 
 import SearchBar from "@/components/mainSearchBar";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import Header from "@/components/Header";
 
 export default function Home() {
@@ -24,7 +24,6 @@ export default function Home() {
 
   return (
     <>
-    <Toaster position="top-center" />
     <Header />
     <main className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-[12vh] bg-page-gradient">
       <h1 className="mb-16 lg:mb-28 text-center text-2xl sm:text-3xl lg:text-4xl font-medium text-black">

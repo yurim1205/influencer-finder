@@ -87,7 +87,7 @@ function SearchResults() {
 
   const handleLoadMore = async () => {
     if ((!searchResult.nextChannelPageToken && !searchResult.nextVideoPageToken) || loadingState.loadingMore) return;
-    setLoadingState({ loading: true, loadingMore: true });
+    setLoadingState({ loading: false, loadingMore: true });
   
     try {
       let currentChannels = searchResult.channels;
@@ -289,6 +289,7 @@ function SearchResults() {
                   <img 
                     src={channel.thumbnail} 
                     alt={channel.name} 
+                    referrerPolicy="no-referrer"
                     className="w-full h-40 object-cover" 
                   />
                 ) : null}

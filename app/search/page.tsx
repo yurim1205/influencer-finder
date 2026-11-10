@@ -1,11 +1,11 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { Channel, searchChannelsHybrid } from '@/lib/youtube';
 import { formatCount } from '@/lib/utils';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ArrowLeft } from 'lucide-react';
 import Header from '@/components/Header';
 
 const searchCache = new Map<string, {
@@ -16,6 +16,7 @@ const searchCache = new Map<string, {
 
 function SearchResults() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const keyword = searchParams.get('keyword') || ''; // url 파라미터 이름 받는 부분
 
   const [searchResult, setSearchResult] = useState({
@@ -87,7 +88,7 @@ function SearchResults() {
 
   const handleLoadMore = async () => {
     if ((!searchResult.nextChannelPageToken && !searchResult.nextVideoPageToken) || loadingState.loadingMore) return;
-    setLoadingState({ loading: true, loadingMore: true });
+    setLoadingState({ loading: false, loadingMore: true });
   
     try {
       let currentChannels = searchResult.channels;
@@ -158,12 +159,15 @@ function SearchResults() {
       <Header />
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <Link 
-            href="/"
-            className="text-purple-600 hover:text-purple-800 mb-4 inline-block"
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={() => router.back()}
+            aria-label="뒤로가기"
+            className="text-gray-500 hover:text-gray-800 transition-colors"
           >
-            ← 돌아가기
-          </Link>
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+        </div>
 
           <div className="flex justify-between items-center gap-4">
             <div>
@@ -174,8 +178,8 @@ function SearchResults() {
                 {loadingState.loading ? (
                     <span className="text-gray-600">검색 중...</span>
                   ) : (
-                    <span className="text-lg font-bold text-purple-600">
-                      총 {filteredChannels.length.toLocaleString()}개 채널 확인 중
+                    <span className="text-base text-gray-600">
+                      총 <span className="font-bold text-[#6A4F6A]">{filteredChannels.length.toLocaleString()}</span>개 채널 확인 중
                     </span>
                   )}
               </p>
@@ -184,7 +188,8 @@ function SearchResults() {
               <div className="relative mt-4">
                 <button
                   onClick={() => setIsOpen(!isOpen)}
-                  className="px-4 py-2 bg-white/80 backdrop-blur-sm border border-purple-200 rounded-xl font-semibold text-gray-600 flex items-center gap-2 shadow-sm"
+                  className="px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl font-semibold 
+                  text-gray-600 flex items-center gap-2 shadow-sm"
                 >
                   {sortType === 'default' ? '관련도순' : sortType === 'subscribers' ? '구독자 많은 순' : '최신순'}
                   <ChevronDown
@@ -203,21 +208,21 @@ function SearchResults() {
                     border-gray-200 z-50 w-40">
                       <button
                         onClick={() => { setSortType('default'); setIsOpen(false); }}
-                        className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-t-xl"
+                        className="w-full px-4 py-3 text-left text-sm hover:bg-[#F5F0F6] rounded-t-xl"
                       >
                         관련도순
                       </button>
 
                       <button
                         onClick={() => { setSortType('subscribers'); setIsOpen(false); }}
-                        className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
+                        className="w-full px-4 py-3 text-left text-sm hover:bg-[#F5F0F6] rounded-b-xl"
                       >
-                        구독자 많은 순
+                        구독자순
                       </button>
 
                       <button
                         onClick={() => { setSortType('latest'); setIsOpen(false); }}
-                        className="w-full px-4 py-3 text-left text-sm hover:bg-purple-50 rounded-b-xl"
+                        className="w-full px-4 py-3 text-left text-sm hover:bg-[#F5F0F6] rounded-b-xl"
                       >
                         최신순
                       </button>
@@ -234,7 +239,7 @@ function SearchResults() {
         {loadingState.loading && searchResult.channels.length === 0 && (
           <div className="text-center py-20">
             <div className="flex flex-col items-center gap-4">
-              <div className="w-10 h-10 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-[#E8DCEA] border-t-[#6A4F6A] rounded-full animate-spin" />
               <p className="text-xl text-gray-600">채널을 검색하는 중...</p>
             </div>
           </div>
@@ -289,6 +294,7 @@ function SearchResults() {
                   <img 
                     src={channel.thumbnail} 
                     alt={channel.name} 
+                    referrerPolicy="no-referrer"
                     className="w-full h-40 object-cover" 
                   />
                 ) : null}
@@ -300,8 +306,8 @@ function SearchResults() {
 
                 {channel.matchVideo && (
                   <div className="mb-3 flex items-start gap-2">
-                    <span className="text-purple-600 text-sm">📹</span>
-                    <p className="text-sm text-purple-600 font-medium line-clamp-2">
+                    <span className="text-[#6A4F6A] text-sm">📹</span>
+                    <p className="text-sm text-[#6A4F6A] font-medium line-clamp-2">
                       {channel.matchVideo.title}
                     </p>
                   </div>
@@ -313,7 +319,7 @@ function SearchResults() {
 
                 <div className="flex flex-col gap-2 text-sm text-gray-500">
                   <span>👥 구독자: {formatCount(channel.subscribers || 0)}</span>
-                  <span className="text-purple-500 text-xs mt-1">📊 평균 조회수는 상세 페이지에서 확인하세요</span>
+                  <span className="text-gray-400 text-xs mt-1">📊 평균 조회수는 상세 페이지에서 확인하세요</span>
                 </div>
               </div>
               </Link>
@@ -325,16 +331,15 @@ function SearchResults() {
             <div className="flex justify-center mt-10">
               {loadingState.loadingMore ? (
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-8 h-8 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+                  <div className="w-8 h-8 border-4 border-[#E8DCEA] border-t-[#6A4F6A] rounded-full animate-spin" />
                   <p className="text-sm text-gray-500">채널을 불러오는 중...</p>
                 </div>
               ) : searchResult.nextChannelPageToken || searchResult.nextVideoPageToken ? (
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingState.loadingMore}
-                  className="px-8 py-3 bg-white/80 backdrop-blur-sm border border-gray-200 text-purple-600 font-semibold rounded-2xl 
-                  hover:bg-purple-50 disabled:opacity-50 transition-all
-                  shadow-lg shadow-purple-500/30"
+                  className="px-8 py-3 bg-white/80 backdrop-blur-sm border border-gray-200 text-[#6A4F6A] font-semibold rounded-2xl 
+                  hover:bg-[#F5F0F6] disabled:opacity-50 transition-all shadow-lg shadow-[#6A4F6A]/15"
                 >
                   더 보기
                 </button>

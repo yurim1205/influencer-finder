@@ -111,6 +111,7 @@ export default function ChannelPage({ params }: ChannelPageProps) {
       .insert({
         user_id: user.id,
         channel_id: channel.id,
+        channel_url: `https://www.youtube.com/channel/${channel.id}`,
         name: channel.name,
         subscribers: channel.subscribers || 0,
         avg_views: avgViews || 0,

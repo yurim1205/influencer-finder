@@ -8,7 +8,7 @@ import {useAuthStore} from '@/app/stores/useAuthStore';
 import { supabase } from '@/lib/supabase';
 import Modal from '@/components/myPageModal';
 import {createPortal} from 'react-dom';
-import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Trash2, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Card from '@/components/Card';
 
@@ -18,6 +18,7 @@ interface MyInfluencer {
   gender: 'M' | 'F';
   subscribers: number;
   avg_views: number;
+  channel_url: string | null;
   description: string;
   contact_point: string;
   contact_email: string;
@@ -269,7 +270,19 @@ export default function MyPage() {
             {filteredData.map((item) => (
               <div key={item.id} className="border-b border-gray-100 last:border-b-0 px-6 py-4">
                 <div className="grid grid-cols-1 md:grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr_80px] gap-2 md:gap-4 items-center">
-                  <span className="font-semibold text-gray-800">{item.name}</span>
+                  {item.channel_url ? (
+                    <a
+                      href={item.channel_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-semibold text-gray-800 hover:text-[#6A4F6A] hover:underline underline-offset-2 transition-colors"
+                    >
+                      {item.name}
+                      <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    </a>
+                  ) : (
+                    <span className="font-semibold text-gray-800">{item.name}</span>
+                  )}
 
                   <span className="text-sm text-gray-500">
                     <span className="md:hidden">성별: </span>
@@ -352,6 +365,7 @@ export default function MyPage() {
           editingId={editingItem?.id}
           initialData={editingItem ? { 
             name: editingItem.name,
+            channelUrl: editingItem.channel_url ?? '',
             subscribers: String(editingItem.subscribers),
             avgViews: String(editingItem.avg_views),
             gender: editingItem.gender,

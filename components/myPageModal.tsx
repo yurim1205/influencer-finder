@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import { useAuthStore } from '@/app/stores/useAuthStore';
+import { parseCount } from '@/lib/utils';
 
 interface ModalProps {
     isOpen: boolean;
@@ -11,6 +12,7 @@ interface ModalProps {
     onSaved: () => void;
     initialData?: {
         name?: string;
+        channelUrl?: string;
         subscribers?: string;
         avgViews?: string;
         intro?: string;
@@ -26,6 +28,7 @@ interface ModalProps {
 export default function Modal({ isOpen, onClose, onSaved, initialData, editingId }: ModalProps) {
     const [formData, setFormData] = useState({
         name: '',
+        channelUrl: '',
         subscribers: '',
         avgViews: '',
         gender: 'M',
@@ -44,6 +47,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
     
         setFormData({
             name: initialData?.name || '',
+            channelUrl: initialData?.channelUrl || '',
             subscribers: initialData?.subscribers || '',
             avgViews: initialData?.avgViews || '',
             gender: initialData?.gender || 'M',
@@ -114,6 +118,22 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
             return;
         }
 
+        // 링크 형식 확인 (https://로 시작하는지 확인)
+        const channelUrl = formData.channelUrl.trim();
+
+        if (channelUrl && !/^https?:\/\//.test(channelUrl)) {
+            alert('채널 링크는 https://로 시작하는 주소로 입력해주세요.');
+            return;
+        }
+
+        const subscribers = parseCount(formData.subscribers);
+        const avgViews = parseCount(formData.avgViews);
+
+        if (Number.isNaN(subscribers) || Number.isNaN(avgViews)) {
+            alert('구독자수와 평균 조회수를 숫자 형식으로 다시 입력해주세요.');
+            return;
+        }
+
         let error;
     
         if (editingId) {
@@ -122,8 +142,9 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                 .from('my_influencers')
                 .update({
                     name,
-                    subscribers: Number(formData.subscribers) || 0,
-                    avg_views: Number(formData.avgViews) || 0,
+                    channel_url: channelUrl || null,
+                    subscribers: subscribers || 0,
+                    avg_views: avgViews || 0,
                     gender: formData.gender,
                     description: formData.intro,
                     contact_point: formData.contactPoint,
@@ -139,7 +160,8 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                 .from('my_influencers')
                 .insert({
                     user_id: user.id,
-                    name,
+                    name, 
+                    channel_url: channelUrl || null,
                     subscribers: Number(formData.subscribers) || 0,
                     avg_views: Number(formData.avgViews) || 0,
                     gender: formData.gender,
@@ -208,6 +230,20 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className={inputClass}
                         />
+
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="channelUrl" className={labelClass}>
+                                채널 링크
+                            </label>
+                            <input
+                                id="channelUrl"
+                                type="url"
+                                placeholder="예: https://www.youtube.com/@채널명"
+                                value={formData.channelUrl}
+                                onChange={(e) => setFormData({ ...formData, channelUrl: e.target.value })}
+                                className={inputClass}
+                            />
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-6 sm:flex-row">
@@ -233,6 +269,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                                 value={formData.avgViews}
                                 onChange={(e) => setFormData({ ...formData, avgViews: e.target.value })}
                                 className={inputClass}
+                                placeholder="예: 141000 또는 14.1만"
                             />
                         </div>
                     </div>

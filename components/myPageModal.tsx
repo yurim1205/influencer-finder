@@ -5,6 +5,7 @@ import { X, ChevronDown } from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import { useAuthStore } from '@/app/stores/useAuthStore';
 import { parseCount } from '@/lib/utils';
+import { CATEGORIES } from '@/lib/categories';
 
 interface ModalProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ interface ModalProps {
         contactNote?: string;
         contactStatus?: string;
         note?: string;
+        category?: string;
     };
     editingId?: string; // 수정 모드인지 아닌지 구분
 }
@@ -36,7 +38,8 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
         contactPoint: '',
         contactNote: '',
         contactStatus: '미컨택',
-        note: '', 
+        note: '',
+        category: '',
     });
 
     const user = useAuthStore((state)=> state.user);
@@ -56,6 +59,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
             contactNote: initialData?.contactNote || '',
             contactStatus: initialData?.contactStatus || '미컨택',
             note: initialData?.note || '',
+            category: initialData?.category || '',
         });
     }, [isOpen, initialData]);
 
@@ -96,6 +100,22 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
             alert('이름은 필수 입력값입니다.');
             return;
         }
+
+        // 링크 형식 확인 (https://로 시작하는지 확인)
+        const channelUrl = formData.channelUrl.trim();
+
+        if (channelUrl && !/^https?:\/\//.test(channelUrl)) {
+            alert('채널 링크는 https://로 시작하는 주소로 입력해주세요.');
+            return;
+        }
+
+        const subscribers = parseCount(formData.subscribers);
+        const avgViews = parseCount(formData.avgViews);
+
+        if (Number.isNaN(subscribers) || Number.isNaN(avgViews)) {
+            alert('구독자수와 평균 조회수를 숫자 형식으로 다시 입력해주세요.');
+            return;
+        }
     
         setIsSaving(true);
 
@@ -118,22 +138,6 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
             return;
         }
 
-        // 링크 형식 확인 (https://로 시작하는지 확인)
-        const channelUrl = formData.channelUrl.trim();
-
-        if (channelUrl && !/^https?:\/\//.test(channelUrl)) {
-            alert('채널 링크는 https://로 시작하는 주소로 입력해주세요.');
-            return;
-        }
-
-        const subscribers = parseCount(formData.subscribers);
-        const avgViews = parseCount(formData.avgViews);
-
-        if (Number.isNaN(subscribers) || Number.isNaN(avgViews)) {
-            alert('구독자수와 평균 조회수를 숫자 형식으로 다시 입력해주세요.');
-            return;
-        }
-
         let error;
     
         if (editingId) {
@@ -151,6 +155,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                     contact_note: formData.contactNote,
                     contact_status: formData.contactStatus,
                     note: formData.note,
+                    category: formData.category || null,
                 })
                 .eq('id', editingId)
                 .eq('user_id', user.id));
@@ -162,14 +167,15 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                     user_id: user.id,
                     name, 
                     channel_url: channelUrl || null,
-                    subscribers: Number(formData.subscribers) || 0,
-                    avg_views: Number(formData.avgViews) || 0,
+                    subscribers,
+                    avg_views: avgViews,
                     gender: formData.gender,
                     description: formData.intro,
                     contact_point: formData.contactPoint,
                     contact_note: formData.contactNote,
                     contact_status: formData.contactStatus,
                     note: formData.note,
+                    category: formData.category || null,
                 }));
         }
 
@@ -230,6 +236,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className={inputClass}
                         />
+                        </div>
 
                         <div className="flex flex-col gap-2">
                             <label htmlFor="channelUrl" className={labelClass}>
@@ -244,7 +251,29 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                                 className={inputClass}
                             />
                         </div>
-                    </div>
+
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="category" className={labelClass}>
+                                카테고리
+                            </label>
+                            <div className="relative">
+                                <select
+                                    id="category"
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className={`${inputClass} appearance-none w-full pr-10`}
+                                >
+                                    <option value="">선택 안 함</option>
+                                    {CATEGORIES.map((category) => (
+                                        <option key={category} value={category}>
+                                            {category}
+                                        </option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 
+                                -translate-y-1/2 text-[#717070]" />
+                            </div>
+                        </div>
 
                     <div className="flex flex-col gap-6 sm:flex-row">
                         <div className="flex flex-1 flex-col gap-2">

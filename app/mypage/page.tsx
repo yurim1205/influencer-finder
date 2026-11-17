@@ -25,6 +25,7 @@ interface MyInfluencer {
   contact_note: string;     // 컨택 시기
   contact_status: '미컨택' | '컨택' | '지원'; // 컨택 이력
   note: string;
+  category: string | null;
 }
 
 const TABS = ['전체', '미컨택', '컨택', '지원'] as const;
@@ -270,19 +271,27 @@ export default function MyPage() {
             {filteredData.map((item) => (
               <div key={item.id} className="border-b border-gray-100 last:border-b-0 px-6 py-4">
                 <div className="grid grid-cols-1 md:grid-cols-[1.5fr_0.7fr_1fr_1fr_1.5fr_1fr_80px] gap-2 md:gap-4 items-center">
-                  {item.channel_url ? (
-                    <a
-                      href={item.channel_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 font-semibold text-gray-800 hover:text-[#6A4F6A] hover:underline underline-offset-2 transition-colors"
-                    >
-                      {item.name}
-                      <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <span className="font-semibold text-gray-800">{item.name}</span>
-                  )}
+                  <div className="flex flex-wrap items-center gap-2 min-w-0">
+                    {item.channel_url ? (
+                      <a
+                        href={item.channel_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 font-semibold text-gray-800 hover:text-[#6A4F6A] hover:underline underline-offset-2 transition-colors"
+                      >
+                        {item.name}
+                        <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      </a>
+                    ) : (
+                      <span className="font-semibold text-gray-800">{item.name}</span>
+                    )}
+
+                    {item.category && (
+                        <span className="px-2 py-0.5 rounded-md bg-[#F5F0F6] text-xs text-[#6A4F6A]">
+                          {item.category}
+                        </span>
+                    )}
+                  </div>
 
                   <span className="text-sm text-gray-500">
                     <span className="md:hidden">성별: </span>
@@ -374,6 +383,7 @@ export default function MyPage() {
             contactNote: editingItem.contact_note,
             contactStatus: editingItem.contact_status,
             note: editingItem.note,
+            category: editingItem.category ?? '',
           } : undefined}
       />
     </div>

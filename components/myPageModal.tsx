@@ -44,10 +44,17 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
 
     const user = useAuthStore((state)=> state.user);
     const [isSaving, setIsSaving] = useState(false);
+    const [isCustomCategory, setIsCustomCategory] = useState(false);
 
     useEffect(() => {
         if (!isOpen) return;
-    
+
+        // 기존 카테고리가 목록에 없는 값이면 "직접 입력"으로 연 것으로 처리
+        const initialCategory = initialData?.category || '';
+        setIsCustomCategory(
+            initialCategory !== '' && !(CATEGORIES as readonly string[]).includes(initialCategory)
+        );
+
         setFormData({
             name: initialData?.name || '',
             channelUrl: initialData?.channelUrl || '',
@@ -155,7 +162,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                     contact_note: formData.contactNote,
                     contact_status: formData.contactStatus,
                     note: formData.note,
-                    category: formData.category || null,
+                    category: formData.category.trim() || null,
                 })
                 .eq('id', editingId)
                 .eq('user_id', user.id));
@@ -175,7 +182,7 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                     contact_note: formData.contactNote,
                     contact_status: formData.contactStatus,
                     note: formData.note,
-                    category: formData.category || null,
+                    category: formData.category.trim() || null,
                 }));
         }
 
@@ -259,8 +266,17 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                             <div className="relative">
                                 <select
                                     id="category"
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    value={isCustomCategory? '__custom__' : formData.category}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value === '__custom__') {
+                                            setIsCustomCategory(true);
+                                            setFormData({ ...formData, category: '' });
+                                        } else {
+                                            setIsCustomCategory(false);
+                                            setFormData({ ...formData, category: value });
+                                        }
+                                    }}
                                     className={`${inputClass} appearance-none w-full pr-10`}
                                 >
                                     <option value="">선택 안 함</option>
@@ -269,10 +285,24 @@ export default function Modal({ isOpen, onClose, onSaved, initialData, editingId
                                             {category}
                                         </option>
                                     ))}
+                                    <option value="__custom__">직접 입력</option>
                                 </select>
                                 <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 
                                 -translate-y-1/2 text-[#717070]" />
                             </div>
+
+                            {isCustomCategory && (
+                                <input
+                                    type="text"
+                                    aria-label="카테고리 직접 입력"
+                                    placeholder="카테고리를 입력해주세요"
+                                    maxLength={20}
+                                    autoFocus
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className={inputClass}
+                                />
+                            )}
                         </div>
 
                     <div className="flex flex-col gap-6 sm:flex-row">
